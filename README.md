@@ -65,3 +65,12 @@ La aplicación admite autenticación real opcional con Supabase. Si `VITE_SUPABA
 5. En Vercel → Project → Settings → Environment Variables, define las dos variables `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` y vuelve a desplegar.
 
 **Importante:** nunca incluyas una `service_role` key en el frontend ni en una variable `VITE_*`. La declaración de edad no equivale a consentimiento parental. Antes de usar cuentas reales de menores, revisa consentimiento, privacidad, recuperación de cuentas y políticas RLS con cuidado. El rol de docente/representante debe verificarse y no confiarse solo a metadatos modificables desde el cliente.
+
+
+## Supabase y despliegue
+
+- Define `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` en Vercel para Production (y también Preview si vas a probar previews). Son variables públicas del cliente; nunca pongas una `service_role` en el frontend.
+- El proyecto sincroniza autenticación, perfil educativo, perfiles infantiles y lecciones completadas mediante las tablas `user_profiles`, `child_profiles` y `learning_progress`.
+- `supabase/schema.sql` es el esquema de referencia para instalaciones nuevas. Si ya ejecutaste el SQL de configuración en tu proyecto Supabase, no vuelvas a ejecutarlo por este cambio.
+- Los roles solicitados en el registro no conceden permisos de profesor. Para habilitar un docente se requiere asignar una reclamación confiable desde el servidor/administración; no uses `user_metadata` como fuente de autorización.
+- Para producción con menores, revisa consentimiento parental, verificación de edad, privacidad y políticas RLS antes de publicar.
