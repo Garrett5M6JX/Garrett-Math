@@ -1,4 +1,4 @@
-# Garrett Math v9.0.0
+# Garrett 
 
 Plataforma educativa de demostración construida con React 18, TypeScript, Vite, CSS y Lucide. Esta versión incorpora portabilidad de datos locales y una frontera de error de React, preservando el recorrido de aprendizaje anterior.
 
