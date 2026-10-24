@@ -1,0 +1,415 @@
+import { useEffect, useState, type FormEvent } from 'react'
+import { starterCourses, type Lesson } from './data/curriculum'
+import { stageInfo } from './data/stages'
+import { LEVEL_OPTIONS, type AccountRole, type ChildProfile, type DemoAccount, type Level } from './types/models'
+import CustomSelect from './components/CustomSelect'
+import Brand from './components/Brand'
+import { downloadBackup, restoreBackup } from './services/backup'
+import { routes } from './router/routes'
+import { supabase, supabaseConfigured } from './services/supabase'
+import {
+  Atom, BookOpen, Brain, Calculator, Check, ChevronRight,
+  Clock3, Compass, GraduationCap, House, LockKeyhole, Menu, Search,
+  Settings2, Sparkles, Star, Sun, Moon, Target, Trophy, Users, X, ChevronDown, ArrowLeft, CalendarDays, NotebookPen, Medal, Layers3, Presentation, ClipboardList, FileText, Lightbulb, School, UserRound, Printer
+} from 'lucide-react'
+
+const courses = [
+  { title: 'Contar y reconocer números', level: 'Preescolar', subject: 'Números y operaciones', progress: 65, color: 'mint', icon: Calculator, lessons: 8, done: 5 },
+  { title: 'Sumas y restas', level: 'Primaria', subject: 'Aritmética básica', progress: 32, color: 'lavender', icon: Target, lessons: 12, done: 4 },
+  { title: 'Fracciones sin miedo', level: 'Primaria', subject: 'Números racionales', progress: 0, color: 'peach', icon: BookOpen, lessons: 9, done: 0 },
+  { title: 'Álgebra: primeros pasos', level: 'Secundaria', subject: 'Álgebra', progress: 0, color: 'blue', icon: Atom, lessons: 14, done: 0 },
+  { title: 'Funciones y límites', level: 'Universidad', subject: 'Cálculo', progress: 0, color: 'pink', icon: Brain, lessons: 16, done: 0 },
+]
+
+
+type AuthView = 'welcome' | 'role' | 'login' | 'register' | 'student-setup'
+const authPath: Record<AuthView, string> = { welcome: routes.home, role: routes.registerRole, login: routes.login, register: routes.register, 'student-setup': routes.studentSetup }
+function authViewFromPath(path: string): AuthView {
+  if (path === '/iniciar-sesion') return 'login'
+  if (path === '/crear-cuenta') return 'register'
+  if (path === '/crear-cuenta/rol') return 'role'
+  if (path === '/configurar-perfil') return 'student-setup'
+  return 'welcome'
+}
+function App() {
+  const [routePath, setRoutePath] = useState(() => window.location.pathname)
+  const [authView, setAuthView] = useState<AuthView>(() => authViewFromPath(window.location.pathname))
+  const navigate = (path: string, replace = false) => {
+    if (window.location.pathname !== path) {
+      if (replace) window.history.replaceState({}, '', path)
+      else window.history.pushState({}, '', path)
+    }
+    setRoutePath(path)
+  }
+  const navigateAuth = (view: AuthView) => { setAuthView(view); navigate(authPath[view]) }
+  useEffect(() => {
+    const onPopState = () => {
+      const path = window.location.pathname
+      setRoutePath(path)
+      setAuthView(authViewFromPath(path))
+      setProfileOpen(path === '/perfil')
+      if (path === '/profesor') setWorkspaceMode('teacher')
+      if (path === '/estudiante' || path === '/estudiante/cursos') setWorkspaceMode('student')
+    }
+    window.addEventListener('popstate', onPopState)
+    return () => window.removeEventListener('popstate', onPopState)
+  }, [])
+  useEffect(() => {
+    if (routePath === routes.studentHome) { setProfileOpen(false); setSelectedStage(null); setWorkspaceMode('student') }
+    if (routePath === routes.studentCourses) { setProfileOpen(false); setWorkspaceMode('student'); setSelectedStage((current) => current || (localStorage.getItem('garrett-math-stage') as Level | null)) }
+    if (routePath === routes.studentProfile) setProfileOpen(true)
+    if (routePath === routes.teacherHome) setWorkspaceMode('teacher')
+  }, [routePath])
+  const [account, setAccount] = useState<DemoAccount | null>(() => { try { return JSON.parse(localStorage.getItem('garrett-math-demo-account') || 'null') as DemoAccount | null } catch { return null } })
+  const [accountRole, setAccountRole] = useState<AccountRole>('student')
+  const [authName, setAuthName] = useState('')
+  const [authEmail, setAuthEmail] = useState('')
+  const [authPassword, setAuthPassword] = useState('')
+  const [ageDeclared, setAgeDeclared] = useState(false)
+  const [authError, setAuthError] = useState('')
+  const [authBusy, setAuthBusy] = useState(false)
+  const [setupStage, setSetupStage] = useState<Level>('Primaria')
+  const [setupYear, setSetupYear] = useState('1.º grado')
+  const [childProfiles, setChildProfiles] = useState<ChildProfile[]>(() => { try { return JSON.parse(localStorage.getItem('garrett-math-child-profiles') || '[]') as ChildProfile[] } catch { return [] } })
+  const [childName, setChildName] = useState('')
+  const [childStage, setChildStage] = useState<Level>('Primaria')
+  const [childYear, setChildYear] = useState('1.º grado')
+  const [activeLevel, setActiveLevel] = useState<Level | 'Todos'>(() => { try { return (localStorage.getItem('garrett-math-stage') as Level | null) || 'Todos' } catch { return 'Todos' } })
+  const [selectedStage, setSelectedStage] = useState<Level | null>(() => { try { return (localStorage.getItem('garrett-math-stage') as Level | null) } catch { return null } })
+  const [stageMenuOpen, setStageMenuOpen] = useState(true)
+  const [profileOpen, setProfileOpen] = useState(false)
+  const [profileStage, setProfileStage] = useState<Level>('Primaria')
+  const [profileYear, setProfileYear] = useState('1.º grado')
+  const [profileMessage, setProfileMessage] = useState('')
+  const [selectedYear, setSelectedYear] = useState(() => { try { return localStorage.getItem('garrett-math-year') || '' } catch { return '' } })
+  const [openedLesson, setOpenedLesson] = useState<{ stage: Level; subject: string; year: string; lesson: Lesson } | null>(null)
+  const [lessonChoice, setLessonChoice] = useState<number | null>(null)
+  const [lessonChecked, setLessonChecked] = useState(false)
+  const [workspaceMode, setWorkspaceMode] = useState<'student' | 'teacher'>('student')
+  const [teacherStage, setTeacherStage] = useState<Level>('Primaria')
+  const [teacherTopic, setTeacherTopic] = useState('Sumas y restas')
+  const [worksheetGenerated, setWorksheetGenerated] = useState(false)
+  const [teacherObjective, setTeacherObjective] = useState('Comprender el tema y resolver ejercicios paso a paso.')
+  const [teacherMaterials, setTeacherMaterials] = useState('Cuaderno, lápiz y pizarra')
+  const [completedLessons, setCompletedLessons] = useState<string[]>(() => { try { return JSON.parse(localStorage.getItem('garrett-math-completed') || '[]') as string[] } catch { return [] } })
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    try { return localStorage.getItem('garrett-math-theme') === 'dark' ? 'dark' : 'light' } catch { return 'light' }
+  })
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme
+    try { localStorage.setItem('garrett-math-theme', theme) } catch { /* almacenamiento opcional */ }
+  }, [theme])
+  const toggleTheme = () => setTheme((current) => current === 'light' ? 'dark' : 'light')
+  useEffect(() => { try { localStorage.setItem('garrett-math-completed', JSON.stringify(completedLessons)) } catch { /* almacenamiento opcional */ } }, [completedLessons])
+  const [search, setSearch] = useState('')
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [notice, setNotice] = useState('')
+  const [showAll, setShowAll] = useState(false)
+  const [lessonOpen, setLessonOpen] = useState(false)
+  const [lessonStage, setLessonStage] = useState<'intro' | 'practice' | 'result'>('intro')
+  const [questionIndex, setQuestionIndex] = useState(0)
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
+  const [score, setScore] = useState(0)
+  const [answered, setAnswered] = useState(false)
+
+  const lessonQuestions = [
+    { count: 2, objects: '🍎 🍎', prompt: '¿Cuántas manzanas hay?', options: [1, 2, 3], answer: 2, hint: 'Cuenta cada manzana una sola vez: una… y luego la otra.' },
+    { count: 4, objects: '⭐ ⭐ ⭐ ⭐', prompt: 'Cuenta las estrellas.', options: [3, 4, 5], answer: 4, hint: 'Señala cada estrella mientras cuentas en voz alta.' },
+    { count: 1, objects: '🦋', prompt: '¿Cuántas mariposas ves?', options: [1, 2, 3], answer: 1, hint: 'Aunque sea un solo objeto, también podemos contarlo.' },
+    { count: 5, objects: '🐠 🐠 🐠 🐠 🐠', prompt: '¿Cuántos peces hay en el agua?', options: [4, 5, 3], answer: 5, hint: 'Cuenta de izquierda a derecha sin saltarte ningún pez.' },
+    { count: 3, objects: '🌼 🌼 🌼', prompt: 'Cuenta las flores del jardín.', options: [2, 3, 4], answer: 3, hint: 'Cada flor cuenta como un objeto. ¿Qué número dices al terminar?' },
+  ]
+
+  const startLesson = () => {
+    setLessonOpen(true); setLessonStage('intro'); setQuestionIndex(0); setSelectedAnswer(null); setScore(0); setAnswered(false); setMenuOpen(false)
+  }
+  const chooseAnswer = (answer: number) => {
+    if (answered) return
+    setSelectedAnswer(answer); setAnswered(true)
+    if (answer === lessonQuestions[questionIndex].answer) setScore((value) => value + 1)
+  }
+  const nextQuestion = () => {
+    if (questionIndex + 1 >= lessonQuestions.length) setLessonStage('result')
+    else { setQuestionIndex((value) => value + 1); setSelectedAnswer(null); setAnswered(false) }
+  }
+
+  const lessonSequence = starterCourses.flatMap((course) => course.subjects.flatMap((subject) => subject.lessons.map((lesson) => ({ stage: course.stage, subject: subject.title, year: course.name, lesson }))))
+  const nextLesson = openedLesson ? (() => { const index = lessonSequence.findIndex((item) => item.lesson.id === openedLesson.lesson.id); return index >= 0 ? lessonSequence[index + 1] : undefined })() : undefined
+
+  const filteredCourses = courses.filter((course) => {
+    const studentStage = selectedStage || (account?.role === 'student' ? setupStage : null)
+    const matchesLevel = account?.role !== 'student' && activeLevel === 'Todos' ? true : course.level === (studentStage || activeLevel)
+    const matchesSearch = `${course.title} ${course.subject} ${course.level}`.toLowerCase().includes(search.toLowerCase())
+    return matchesLevel && matchesSearch
+  })
+
+  const announce = (message: string) => {
+    setNotice(message)
+    window.setTimeout(() => setNotice(''), 2800)
+    setMenuOpen(false)
+  }
+
+  useEffect(() => { if (account?.role === 'teacher') setWorkspaceMode('teacher'); else if (account?.role === 'student') setWorkspaceMode('student'); if (window.location.pathname === '/perfil') setProfileOpen(true); if (window.location.pathname === '/estudiante/cursos') setSelectedStage((current) => current || (localStorage.getItem('garrett-math-stage') as Level | null)) }, [account?.role])
+  useEffect(() => { try { if (selectedStage) localStorage.setItem('garrett-math-stage', selectedStage); else localStorage.removeItem('garrett-math-stage'); if (selectedYear) localStorage.setItem('garrett-math-year', selectedYear); else localStorage.removeItem('garrett-math-year') } catch { /* almacenamiento local opcional */ } }, [selectedStage, selectedYear])
+  useEffect(() => { if (selectedStage) setProfileStage(selectedStage); if (selectedYear) setProfileYear(selectedYear) }, [selectedStage, selectedYear])
+  useEffect(() => { try { localStorage.setItem('garrett-math-child-profiles', JSON.stringify(childProfiles)) } catch { /* almacenamiento local opcional */ } }, [childProfiles])
+
+  const demoSignIn = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault(); setAuthError('')
+    if (!authEmail.includes('@')) { setAuthError('Escribe un correo electrónico válido.'); return }
+    if (authPassword.length < 6) { setAuthError('La contraseña debe tener al menos 6 caracteres.'); return }
+    if (authView === 'register' && !authName.trim()) { setAuthError('Escribe el nombre o alias del perfil.'); return }
+    if (!ageDeclared) { setAuthError('Confirma la declaración de edad para continuar.'); return }
+    setAuthBusy(true)
+    try {
+      if (supabase) {
+        if (authView === 'register') {
+          const { data, error } = await supabase.auth.signUp({
+            email: authEmail.trim(), password: authPassword,
+            options: { data: { display_name: authName.trim(), requested_role: accountRole, age_declaration_confirmed: ageDeclared } },
+          })
+          if (error) throw error
+          if (!data.session) {
+            setAuthError('Cuenta creada. Revisa tu correo para confirmar la dirección y luego inicia sesión.');
+            setAuthView('login'); navigate(authPath.login); return
+          }
+        } else {
+          const { error } = await supabase.auth.signInWithPassword({ email: authEmail.trim(), password: authPassword })
+          if (error) throw error
+        }
+        const { data: userData } = await supabase.auth.getUser()
+        const user = userData.user
+        const metadata = user?.user_metadata || {}
+        const requestedRole = metadata.requested_role
+        const safeRole: AccountRole = requestedRole === 'teacher' || requestedRole === 'parent' ? requestedRole : accountRole
+        const nextAccount: DemoAccount = { name: String(metadata.display_name || authName.trim() || authEmail.split('@')[0]), email: authEmail.trim(), role: safeRole, ageDeclared: Boolean(metadata.age_declaration_confirmed ?? ageDeclared) }
+        setAccount(nextAccount)
+        try { localStorage.setItem('garrett-math-demo-account', JSON.stringify(nextAccount)) } catch { /* almacenamiento local opcional */ }
+        if (safeRole === 'student') navigateAuth('student-setup')
+        else { setWorkspaceMode(safeRole === 'teacher' ? 'teacher' : 'student'); navigate(safeRole === 'teacher' ? '/profesor' : '/familia') }
+      } else {
+        await new Promise(resolve => window.setTimeout(resolve, 250))
+        const nextAccount: DemoAccount = { name: authName.trim() || authEmail.split('@')[0], email: authEmail.trim(), role: accountRole, ageDeclared }
+        setAccount(nextAccount); try { localStorage.setItem('garrett-math-demo-account', JSON.stringify(nextAccount)) } catch { /* almacenamiento local opcional */ }
+        if (accountRole === 'student') navigateAuth('student-setup')
+        else { setWorkspaceMode(accountRole === 'teacher' ? 'teacher' : 'student'); navigate(accountRole === 'teacher' ? '/profesor' : '/familia') }
+      }
+    } catch (error) {
+      setAuthError(error instanceof Error ? error.message : 'No se pudo iniciar sesión. Revisa la configuración de Supabase.')
+    } finally { setAuthBusy(false) }
+  }
+  const signOut = () => { if (supabase) void supabase.auth.signOut(); setAccount(null); try { localStorage.removeItem('garrett-math-demo-account') } catch { /* almacenamiento opcional */ }; navigateAuth('welcome'); navigate('/'); setAuthError(''); setSelectedStage(null); setOpenedLesson(null); setProfileOpen(false) }
+  useEffect(() => {
+    const path = window.location.pathname
+    if (!account && ['/estudiante', '/estudiante/cursos', '/perfil', '/profesor', '/familia', '/configurar-perfil'].includes(path)) navigate(routes.login, true)
+    else if (account && ['/iniciar-sesion', '/crear-cuenta', '/crear-cuenta/rol', '/'].includes(path)) {
+      if (account.role === 'teacher') navigate('/profesor', true)
+      else if (account.role === 'parent') navigate('/familia', true)
+      else if (!selectedStage) navigate('/configurar-perfil', true)
+      else navigate('/estudiante', true)
+    }
+    if (account?.role === 'teacher' && path !== '/profesor') navigate('/profesor', true)
+    if (account?.role === 'parent' && path !== '/familia') navigate('/familia', true)
+    if (account?.role === 'student' && path === '/profesor') navigate('/estudiante', true)
+  }, [account])
+
+  if (!account || authView === 'student-setup') {
+    const finishStudentSetup = () => { setSelectedStage(setupStage); setSelectedYear(setupYear || stageInfo[setupStage].years[0]); setActiveLevel(setupStage); setAuthView('welcome'); navigate(routes.studentHome) }
+    return <div className="auth-shell"><div className="auth-card"><Brand />
+      {authView === 'student-setup' && account ? <><span className="auth-kicker">PERSONALIZA TU RECORRIDO</span><h1>¡Hola, {account.name}!</h1><p>Selecciona tu etapa y curso. Podrás revisarlos desde tu perfil.</p><CustomSelect label="Etapa educativa" value={setupStage} options={LEVEL_OPTIONS.map(x => ({ label: x, value: x }))} onChange={value => { const stage = value as Level; setSetupStage(stage); setSetupYear(stageInfo[stage].years[0]) }} /><CustomSelect label="Curso o año" value={setupYear} options={stageInfo[setupStage].years.map(x => ({ label: x, value: x }))} onChange={setSetupYear} /><button className="auth-primary" onClick={finishStudentSetup}>Entrar a mi espacio <ChevronRight size={18}/></button></> : authView === 'welcome' ? <><span className="auth-kicker">TU FUTURO EMPIEZA AQUÍ</span><h1>Las matemáticas empiezan <em>contigo.</em></h1><p>Un espacio para explorar, practicar y crecer a tu propio ritmo.</p><div className="auth-feature-list"><div><BookOpen/><span><b>Aprende por etapas</b><small>Desde preescolar hasta universidad</small></span></div><div><Target/><span><b>Practica con propósito</b><small>Lecciones y progreso local</small></span></div><div><Users/><span><b>Espacios para cada rol</b><small>Estudiantes, docentes y familias</small></span></div></div><button className="auth-primary" onClick={() => navigateAuth('role')}>Crear una cuenta <ChevronRight size={18}/></button><button className="auth-secondary" onClick={() => { navigateAuth('login'); setAccountRole('student') }}>Ya tengo una cuenta</button><p className="auth-demo-note"><LockKeyhole size={14}/> Modo de demostración: no se crea una cuenta en la nube.</p></> : authView === 'role' ? <><button className="auth-back" onClick={() => navigateAuth('welcome')}><ArrowLeft size={16}/> Volver</button><span className="auth-kicker">TIPO DE CUENTA</span><h1>¿Cómo usarás Garrett Math?</h1><p>Elegiremos el espacio adecuado para ti.</p><div className="role-options">{([{id:'student',title:'Estudiante',desc:'Aprender y seguir mi progreso',icon:GraduationCap},{id:'teacher',title:'Profesor/a',desc:'Preparar clases y recursos',icon:Presentation},{id:'parent',title:'Representante',desc:'Administrar perfiles infantiles',icon:Users}] as const).map(r => <button key={r.id} className="role-option" onClick={() => { setAccountRole(r.id); navigateAuth('register'); setAuthError('') }}><r.icon size={23}/><span><b>{r.title}</b><small>{r.desc}</small></span><ChevronRight size={18}/></button>)}</div></> : <><button className="auth-back" onClick={() => { navigateAuth(authView === 'login' ? 'welcome' : 'role'); setAuthError('') }}><ArrowLeft size={16}/> Volver</button><span className="auth-kicker">{authView === 'register' ? 'CREAR PERFIL' : 'BIENVENIDO DE NUEVO'}</span><h1>{authView === 'register' ? 'Comencemos.' : 'Inicia sesión.'}</h1><p>{authView === 'register' ? `Cuenta de ${accountRole === 'student' ? 'estudiante' : accountRole === 'teacher' ? 'profesor/a' : 'representante'} ${supabaseConfigured ? 'con Supabase' : 'en modo local'}.` : supabaseConfigured ? 'Accede con tu cuenta de Supabase.' : 'Accede a una sesión de demostración en este dispositivo.'}</p><form onSubmit={demoSignIn} className="auth-form">{authView === 'register' && <label>Nombre o alias<input value={authName} onChange={e => setAuthName(e.target.value)} autoComplete="name" required placeholder="Cómo te llamamos"/></label>}<label>Correo electrónico<input type="email" value={authEmail} onChange={e => setAuthEmail(e.target.value)} autoComplete="email" required placeholder="tu@correo.com"/></label><label>{supabaseConfigured ? 'Contraseña' : 'Contraseña de demostración'}<input type="password" value={authPassword} onChange={e => setAuthPassword(e.target.value)} autoComplete={authView === 'login' ? 'current-password' : 'new-password'} minLength={6} required placeholder="Al menos 6 caracteres"/></label><label className="age-confirm"><input type="checkbox" checked={ageDeclared} onChange={e => setAgeDeclared(e.target.checked)}/><span>Confirmo la declaración de edad para continuar. Entiendo que esto <b>no equivale a consentimiento parental</b> ni sustituye los requisitos legales aplicables.</span></label>{authError && <p className="auth-error" role="alert">{authError}</p>}<button className="auth-primary" type="submit" disabled={authBusy}>{authBusy ? 'Procesando…' : supabaseConfigured ? (authView === 'register' ? 'Crear cuenta' : 'Iniciar sesión') : 'Continuar en modo demo'} <ChevronRight size={18}/></button></form><button className="auth-link" onClick={() => setAuthError('La recuperación de contraseña estará disponible al conectar un proveedor de autenticación real (por ejemplo, Supabase).')}>¿Olvidaste tu contraseña?</button>{authError && authView !== 'register' && <p className="auth-error" role="status">{authError}</p>}<p className="auth-demo-note"><LockKeyhole size={14}/> {supabaseConfigured ? 'Autenticación mediante Supabase. Configura confirmación de correo y políticas de seguridad antes de producción.' : 'No se envían credenciales a ningún servidor.'}</p></>}
+    </div><footer className="auth-footer">Garrett Math v8 · Datos locales de demostración</footer></div>
+  }
+
+  if (account.role === 'parent') return <div className="auth-shell parent-shell"><div className="auth-card parent-card"><Brand family subtitle="Espacio familiar" action={<button className="auth-logout" onClick={signOut}>Cerrar sesión</button>} /><span className="auth-kicker">PERFILES EDUCATIVOS</span><h1>Hola, {account.name}</h1><p>Crea perfiles con alias; no hace falta que cada niño se registre por su cuenta.</p><form className="child-form" onSubmit={e => { e.preventDefault(); if (!childName.trim()) return; setChildProfiles(old => [...old, { id: Date.now(), name: childName.trim(), stage: childStage, year: childYear }]); setChildName('') }}><label>Nombre o alias del perfil infantil<input value={childName} onChange={e => setChildName(e.target.value)} placeholder="Ej. Peque explorador" required/></label><label>Etapa<select value={childStage} onChange={e => { const stage = e.target.value as Level; setChildStage(stage); setChildYear(stageInfo[stage].years[0]) }}>{LEVEL_OPTIONS.map(x => <option key={x}>{x}</option>)}</select></label><label>Curso o año<select value={childYear} onChange={e => setChildYear(e.target.value)}>{stageInfo[childStage].years.map(x => <option key={x}>{x}</option>)}</select></label><button className="auth-primary" type="submit">Añadir perfil <Users size={17}/></button></form><h2>Perfiles de este dispositivo</h2>{childProfiles.length ? <div className="child-profile-list">{childProfiles.map(child => <article key={child.id}><div className="child-avatar"><UserRound/></div><div><b>{child.name}</b><small>{child.stage} · {child.year}</small><small>Seguimiento sincronizado: aún no disponible</small></div><button aria-label={`Eliminar perfil ${child.name}`} onClick={() => setChildProfiles(old => old.filter(x => x.id !== child.id))}><X size={17}/></button></article>)}</div> : <div className="parent-empty"><Users size={26}/><b>Aún no hay perfiles</b><span>Aquí aparecerán los perfiles educativos que agregues.</span></div>}<p className="auth-demo-note"><LockKeyhole size={14}/> Perfiles guardados solo en este navegador. La vinculación y los informes reales requieren backend.</p></div><footer className="auth-footer">Garrett Math v9 · Espacio familiar de demostración</footer></div>
+
+  if (lessonOpen) {
+    const question = lessonQuestions[questionIndex]
+    return (
+      <div className={`lesson-shell ${theme === 'dark' ? 'theme-dark' : ''}`}>
+        <header className="lesson-topbar">
+          <button className="lesson-back" onClick={() => setLessonOpen(false)}><House size={17} /> Salir de la lección</button>
+          <div className="lesson-brand"><span className="lesson-brand-mark"><GraduationCap size={20} /></span> Garrett <b>Math</b></div>
+          <span className="lesson-level-tag">PREESCOLAR</span>
+        </header>
+        <main className="lesson-main">
+          {lessonStage !== 'result' && <div className="lesson-progress-wrap"><div className="lesson-progress-label"><span>{lessonStage === 'intro' ? 'ANTES DE EMPEZAR' : `ACTIVIDAD ${questionIndex + 1} DE ${lessonQuestions.length}`}</span><span>{lessonStage === 'intro' ? '¡Tú puedes!' : `${Math.round(((questionIndex + 1) / lessonQuestions.length) * 100)}%`}</span></div><div className="lesson-progress-track"><span style={{ width: lessonStage === 'intro' ? '0%' : `${((questionIndex + 1) / lessonQuestions.length) * 100}%` }} /></div></div>}
+          {lessonStage === 'intro' && <section className="lesson-panel lesson-intro"><div className="lesson-badge"><Sparkles size={15} /> MI PRIMERA AVENTURA</div><h1>¡Vamos a contar<br/><span>del 1 al 5!</span></h1><p className="lesson-lead">Los números nos ayudan a saber cuántas cosas hay. ¡Vamos a descubrirlos juntos!</p><div className="number-ladder">{[1,2,3,4,5].map((n) => <div key={n} className={`number-card number-${n}`}><strong>{n}</strong><span>{['uno','dos','tres','cuatro','cinco'][n-1]}</span><small>{['●','● ●','● ● ●','● ● ● ●','● ● ● ● ●'][n-1]}</small></div>)}</div><div className="lesson-tip"><span className="tip-icon">✦</span><div><strong>Un consejo para contar</strong><p>Toca o señala cada objeto una sola vez. Di los números en orden y el último número te dice cuántos objetos hay.</p></div></div><button className="primary-button lesson-start-button" onClick={() => setLessonStage('practice')}>¡Empezar a practicar! <ChevronRight size={19} /></button></section>}
+          {lessonStage === 'practice' && <section className="lesson-panel lesson-question-panel"><div className="question-kicker">VAMOS A PRACTICAR</div><h1>{question.prompt}</h1><p className="question-instruction">Mira con atención y elige el número correcto.</p><div className="counting-stage"><div className="object-cloud" aria-label={`${question.count} objetos`}>{question.objects}</div></div><div className="answer-options" role="group" aria-label="Opciones de respuesta">{question.options.map((option) => <button key={option} className={`answer-option ${answered && option === question.answer ? 'answer-correct' : ''} ${answered && selectedAnswer === option && option !== question.answer ? 'answer-wrong' : ''}`} onClick={() => chooseAnswer(option)} disabled={answered}><span className="answer-number">{option}</span><span>{['uno','dos','tres','cuatro','cinco'][option-1]}</span>{answered && option === question.answer && <Check size={18} />}</button>)}</div>{answered && <div className={`answer-feedback ${selectedAnswer === question.answer ? 'feedback-good' : 'feedback-help'}`} role="status"><span className="feedback-symbol">{selectedAnswer === question.answer ? '¡Muy bien!' : '¡Sigamos aprendiendo!'}</span><p>{selectedAnswer === question.answer ? `¡Exacto! Hay ${question.answer} ${question.answer === 1 ? 'objeto' : 'objetos'}. Contaste con atención.` : `La respuesta es ${question.answer}. ${question.hint}`}</p></div>}<div className="question-footer"><span><Star size={16} /> Cada intento te ayuda a aprender</span>{answered && <button className="primary-button" onClick={nextQuestion}>{questionIndex + 1 === lessonQuestions.length ? 'Ver resultado' : 'Siguiente'} <ChevronRight size={17} /></button>}</div></section>}
+          {lessonStage === 'result' && <section className="lesson-panel lesson-result"><div className="result-medal"><Trophy size={44} /></div><div className="lesson-badge">LECCIÓN COMPLETADA</div><h1>¡Lo hiciste genial!</h1><p className="lesson-lead">Terminaste tu primera aventura de contar. Lo importante es seguir practicando.</p><div className="result-score"><strong>{score}<span> / {lessonQuestions.length}</span></strong><small>respuestas correctas</small></div><div className="result-message">{score === 5 ? '¡Excelente! Reconoces y cuentas grupos de objetos con mucha atención.' : score >= 3 ? '¡Buen trabajo! Ya estás aprendiendo a contar. Puedes repetir la lección para practicar un poco más.' : '¡Buen comienzo! Practicar te ayudará a reconocer mejor las cantidades. Inténtalo otra vez.'}</div><div className="result-actions"><button className="primary-button" onClick={startLesson}>Repetir la lección <Target size={17} /></button><button className="secondary-button" onClick={() => setLessonOpen(false)}>Volver al inicio</button></div></section>}
+          <p className="lesson-footnote">Garrett Math · Aprende a tu ritmo</p>
+        </main>
+      </div>
+    )
+  }
+
+  return (
+    <div className={`app-shell ${theme === 'dark' ? 'theme-dark' : ''} ${workspaceMode === 'teacher' ? 'teacher-mode' : ''}`}>
+      <aside className={`sidebar ${menuOpen ? 'sidebar-open' : ''}`}>
+        <div className="brand">
+          <div className="brand-mark"><GraduationCap size={23} strokeWidth={2.4} /></div>
+          <div><strong>Garrett <span>Math</span></strong><small>Aprende a tu ritmo</small></div>
+          <button className="mobile-close icon-button" onClick={() => setMenuOpen(false)} aria-label="Cerrar menú"><X size={19} /></button>
+        </div>
+
+        <div className="workspace-label">TU ESPACIO</div>
+        <nav className="nav-list">
+          {account.role === 'student' && <button className={`nav-item ${selectedStage === null && workspaceMode === 'student' ? 'active' : ''}`} onClick={() => { setWorkspaceMode('student'); setSelectedStage(null); setProfileOpen(false); setMenuOpen(false); navigate(routes.studentHome) }}><House size={18} />Inicio</button>}
+          {account.role === 'teacher' && <button className={`nav-item ${workspaceMode === 'teacher' ? 'active' : ''}`} onClick={() => { setWorkspaceMode('teacher'); setSelectedStage(null); setProfileOpen(false); setMenuOpen(false); navigate(routes.teacherHome) }}><Presentation size={18} />Espacio docente</button>}
+          {account.role === 'student' && <div className="stage-nav-group">
+            <button className={`nav-item stage-nav-toggle ${selectedStage ? 'active' : ''}`} onClick={() => setStageMenuOpen((open) => !open)} aria-expanded={stageMenuOpen}><Layers3 size={18} />Etapa <ChevronDown className={`stage-chevron ${stageMenuOpen ? 'expanded' : ''}`} size={16} /></button>
+            {stageMenuOpen && <div className="stage-subnav">{(selectedStage ? [selectedStage] : []).map((stage) => <button key={stage} className={`stage-subnav-item ${selectedStage === stage ? 'selected' : ''}`} onClick={() => { setSelectedStage(stage); setSelectedYear(stageInfo[stage].years[0]); setActiveLevel(stage); setProfileOpen(false); setMenuOpen(false); navigate(routes.studentCourses); window.scrollTo({ top: 0, behavior: 'smooth' }) }}><span className={`stage-dot ${stageInfo[stage].color}`} />{stage}<ChevronRight size={14} /></button>)}</div>}
+          </div>}
+          {account.role === 'student' && <button className="nav-item" onClick={() => announce('La biblioteca completa estará disponible en una próxima etapa.')}><BookOpen size={18} />Biblioteca matemática</button>}
+          {account.role === 'student' && <button className="nav-item" onClick={() => announce('El tutor Garrett AI se integrará en una próxima etapa.')}><Brain size={18} />Garrett AI <span className="soon-tag">PRONTO</span></button>}
+          {account.role === 'student' && <button className="nav-item" onClick={() => announce('Tu progreso detallado estará disponible cuando activemos las cuentas.')}><Trophy size={18} />Mi progreso</button>}
+        </nav>
+
+        <div className="sidebar-divider" />
+        <div className="workspace-label">TU APRENDIZAJE</div>
+        <div className="weekly-card">
+          <div className="weekly-icon"><Star size={18} fill="currentColor" /></div>
+          <div className="weekly-content">
+            <strong>Pequeños pasos</strong>
+            <p>Un poco cada día hace la diferencia.</p>
+            <div className="mini-progress"><span /></div>
+          </div>
+        </div>
+        <div className="sidebar-bottom">
+          <div className="profile-avatar">{workspaceMode === 'teacher' ? 'PD' : 'GM'}</div>
+          <div className="profile-copy"><strong>{account.name}</strong><small>{workspaceMode === 'teacher' ? 'Profesor/a' : `${selectedStage ?? 'Estudiante'} · Demo local`}</small></div><button className="profile-logout" onClick={signOut} title="Cerrar sesión" aria-label="Cerrar sesión"><LockKeyhole size={15}/></button>
+          <button className="icon-button settings-button" onClick={() => { setProfileStage(selectedStage || setupStage); setProfileYear(selectedYear || setupYear); setProfileOpen(true); setMenuOpen(false); navigate(routes.studentProfile); window.scrollTo({ top: 0, behavior: 'smooth' }) }} aria-label="Editar perfil educativo" title="Editar perfil educativo"><Settings2 size={18} /></button>
+        </div>
+      </aside>
+
+      {menuOpen && <button className="mobile-overlay" onClick={() => setMenuOpen(false)} aria-label="Cerrar menú" />}
+
+      <main className="main-content">
+        <header className="topbar">
+          <button className="mobile-menu icon-button" onClick={() => setMenuOpen(true)} aria-label="Abrir menú"><Menu size={21} /></button>
+          <div className="breadcrumb" data-route={routePath}>Mi espacio <ChevronRight size={15} /> <strong>{workspaceMode === 'teacher' ? 'Espacio docente' : profileOpen ? 'Mi perfil educativo' : selectedStage ?? 'Inicio'}</strong></div>
+          <div className="topbar-actions">
+            <div className="search-box"><Search size={17} /><input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar un tema..." aria-label="Buscar un tema" /></div>
+            <button className="theme-toggle" onClick={toggleTheme} aria-label={theme === 'light' ? 'Activar modo oscuro' : 'Activar modo claro'} title={theme === 'light' ? 'Activar modo oscuro' : 'Activar modo claro'}>{theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}<span>{theme === 'light' ? 'Modo oscuro' : 'Modo claro'}</span></button>
+          </div>
+        </header>
+
+        <div className="page-content">
+          {profileOpen && account.role === 'student' ? (
+            <section className="profile-page">
+              <button className="back-link" onClick={() => { setProfileOpen(false); setProfileMessage(''); navigate(routes.studentHome) }}><ArrowLeft size={16} /> Volver a mi espacio</button>
+              <div className="profile-hero"><div className="profile-hero-icon"><UserRound size={27}/></div><span className="section-kicker">TU CUENTA DE APRENDIZAJE</span><h1>Mi perfil educativo</h1><p>Actualiza tu etapa o grado cuando cambie tu recorrido. Podrás explorar todos los cursos de tu etapa actual.</p></div>
+              <form className="profile-editor" onSubmit={e => { e.preventDefault(); setSelectedStage(profileStage); setSelectedYear(profileYear); setActiveLevel(profileStage); setSetupStage(profileStage); setSetupYear(profileYear); setProfileOpen(false); setProfileMessage(''); navigate(routes.studentHome); setNotice('Perfil educativo actualizado correctamente.'); window.scrollTo({ top: 0, behavior: 'smooth' }) }}>
+                <label>Nombre o alias<input value={account.name} readOnly aria-describedby="profile-name-note"/></label><small id="profile-name-note" className="profile-help">El nombre de la cuenta de demostración se edita desde la configuración de cuenta en una versión futura.</small>
+                <CustomSelect label="Etapa educativa" value={profileStage} options={LEVEL_OPTIONS.map(x => ({ label: x, value: x }))} onChange={value => { const next = value as Level; setProfileStage(next); setProfileYear(stageInfo[next].years[0]) }} />
+                <CustomSelect label="Grado o curso actual" value={profileYear} options={stageInfo[profileStage].years.map(x => ({ label: x, value: x }))} onChange={setProfileYear} />
+                <div className="profile-stage-note"><BookOpen size={18}/><span><strong>Tu etapa controla el catálogo</strong><small>Al guardar, se mostrarán los cursos de {profileStage}. Puedes explorar cualquier grado de esta etapa, no solo tu grado actual.</small></span></div>
+                {profileMessage && <p role="status" className="profile-message">{profileMessage}</p>}
+                <div className="profile-form-actions"><button type="button" className="secondary-button" onClick={() => { setProfileOpen(false); setProfileMessage(''); navigate(routes.studentHome) }}>Cancelar</button><button type="submit" className="primary-button"><Check size={17}/> Guardar cambios</button></div>
+              </form>
+              <section className="profile-backup-panel" aria-labelledby="backup-title">
+                <div><span className="section-kicker">CONTROL DE TUS DATOS</span><h2 id="backup-title">Copia de seguridad local</h2><p>Exporta una copia de los perfiles, la etapa, el tema y el progreso guardados en este navegador. La copia no se envía a ningún servidor.</p></div>
+                <div className="profile-form-actions"><button type="button" className="secondary-button" onClick={() => downloadBackup()}><FileText size={16}/> Descargar copia</button><label className="secondary-button backup-import-label">Restaurar copia<input type="file" accept="application/json,.json" hidden onChange={async e => { const file = e.currentTarget.files?.[0]; if (!file) return; try { await restoreBackup(file); setNotice('Copia restaurada. La aplicación se recargará.'); window.setTimeout(() => window.location.reload(), 500) } catch (error) { setNotice(error instanceof Error ? error.message : 'No se pudo restaurar la copia.') } finally { e.currentTarget.value = '' } }} /></label></div>
+              </section>
+              <div className="profile-note"><LockKeyhole size={17}/><p>Este perfil se guarda localmente en este navegador. Los permisos y la sincronización entre dispositivos se asegurarán al conectar autenticación y base de datos. No guardes información sensible en esta demo.</p></div>
+            </section>
+          ) : workspaceMode === 'teacher' ? (
+            <section className="teacher-page">
+              <section className="teacher-hero">
+                <div className="eyebrow"><School size={16} /> ESPACIO DOCENTE</div>
+                <h1>Enseñar también es <span>inspirar.</span></h1>
+                <p>Prepara clases, organiza recursos y acompaña el aprendizaje matemático desde un solo lugar.</p>
+                <div className="teacher-hero-actions"><button className="primary-button" onClick={() => { setTeacherTopic('Sumas y restas'); setWorksheetGenerated(false); announce('El generador de ejercicios está listo para configurar.') }}><ClipboardList size={17} /> Preparar ejercicios</button><button className="secondary-button" onClick={() => announce('Las guías docentes se irán ampliando por etapa y tema.')}><BookOpen size={17} /> Explorar guías</button></div>
+              </section>
+              <div className="teacher-stat-grid"><article><span className="teacher-stat-icon"><FileText size={20} /></span><div><strong>Guías de clase</strong><p>Planificaciones y explicaciones por tema</p></div></article><article><span className="teacher-stat-icon peach"><ClipboardList size={20} /></span><div><strong>Banco de ejercicios</strong><p>Actividades listas para adaptar</p></div></article><article><span className="teacher-stat-icon mint"><Users size={20} /></span><div><strong>Seguimiento del aula</strong><p>Preparado para futuras clases y grupos</p></div></article></div>
+              <section className="teacher-builder">
+                <div className="teacher-section-heading"><div><span className="section-kicker">HERRAMIENTA DE DEMOSTRACIÓN</span><h2>Preparar una práctica</h2><p>Selecciona una etapa y un tema para crear una pequeña hoja de ejercicios de ejemplo.</p></div></div>
+                <div className="teacher-form-grid"><label>Etapa educativa<select value={teacherStage} onChange={(e) => { const next = e.target.value as Level; setTeacherStage(next); setTeacherTopic(stageInfo[next].subjects[0]); setWorksheetGenerated(false) }}>{(['Preescolar','Primaria','Secundaria','Universidad'] as Level[]).map((stage) => <option key={stage}>{stage}</option>)}</select></label><label>Tema<select value={teacherTopic} onChange={(e) => { setTeacherTopic(e.target.value); setWorksheetGenerated(false) }}>{stageInfo[teacherStage].subjects.map((topic) => <option key={topic}>{topic}</option>)}</select></label><label>Objetivo de la clase<input value={teacherObjective} onChange={(e) => setTeacherObjective(e.target.value)} placeholder="¿Qué aprenderá el grupo?" /></label><label>Materiales<input value={teacherMaterials} onChange={(e) => setTeacherMaterials(e.target.value)} placeholder="Materiales necesarios" /></label><button className="primary-button" onClick={() => setWorksheetGenerated(true)}><Sparkles size={17} /> Generar ejemplo</button></div>
+                {worksheetGenerated && <div className="worksheet-preview"><div className="worksheet-title"><div><span className="section-kicker">HOJA DE PRÁCTICA · BORRADOR</span><h3>{teacherTopic}</h3><p>{teacherStage} · Material de demostración editable</p><p><strong>Objetivo:</strong> {teacherObjective}</p><p><strong>Materiales:</strong> {teacherMaterials}</p></div><button className="secondary-button" onClick={() => window.print()}><Printer size={16} /> Imprimir</button></div><ol>{(teacherStage === 'Preescolar' ? [`Cuenta 3 objetos y dibuja la cantidad.`, `¿Qué número viene después del 2?`, `Rodea el grupo que tiene más elementos.`] : teacherStage === 'Primaria' ? [`Resuelve una operación de ${teacherTopic.toLowerCase()} y explica tu estrategia.`, `Inventa un problema cotidiano que se resuelva con ${teacherTopic.toLowerCase()}.`, `Comprueba tu respuesta usando otra estrategia.`] : teacherStage === 'Secundaria' ? [`Resuelve un problema introductorio de ${teacherTopic.toLowerCase()}.`, `Explica cada paso y justifica la operación utilizada.`, `Crea un ejemplo parecido y verifica el resultado.`] : [`Define un problema introductorio de ${teacherTopic.toLowerCase()}.`, `Resuelve el problema mostrando hipótesis y procedimiento.`, `Interpreta el resultado y verifica sus condiciones.`]).map((item) => <li key={item}>{item}</li>)}</ol><p className="worksheet-disclaimer">Este borrador es una plantilla inicial, no una evaluación validada. Revísalo y adáptalo antes de utilizarlo en clase.</p></div>}
+              </section>
+              <section className="teacher-resource-section"><div className="teacher-section-heading"><div><span className="section-kicker">RECURSOS PARA ENSEÑAR</span><h2>Tu caja de herramientas</h2><p>La estructura inicial para futuras guías, ejercicios y recursos de aula.</p></div></div><div className="teacher-resource-grid"><button className="teacher-resource-card" onClick={() => announce('La guía didáctica se desarrollará con objetivos, conceptos previos, explicación, ejemplos y errores comunes.')}><span className="teacher-resource-icon"><BookOpen size={22}/></span><strong>Guías didácticas</strong><p>Objetivos, secuencia de clase, ejemplos y errores frecuentes.</p><span>Ver estructura <ChevronRight size={15}/></span></button><button className="teacher-resource-card" onClick={() => announce('El banco de ejercicios incluirá nivel de dificultad, solución explicada y etiquetas curriculares.')}><span className="teacher-resource-icon peach"><ClipboardList size={22}/></span><strong>Banco de ejercicios</strong><p>Problemas clasificados por tema, curso y dificultad.</p><span>Ver estructura <ChevronRight size={15}/></span></button><button className="teacher-resource-card" onClick={() => announce('La planificación de clase permitirá definir duración, materiales, actividades y evaluación.')}><span className="teacher-resource-icon mint"><CalendarDays size={22}/></span><strong>Planificador de clase</strong><p>Organiza inicio, explicación, práctica y cierre.</p><span>Ver estructura <ChevronRight size={15}/></span></button><button className="teacher-resource-card" onClick={() => announce('La sección de evaluación incluirá rúbricas, criterios y retroalimentación para estudiantes.')}><span className="teacher-resource-icon blue"><Medal size={22}/></span><strong>Evaluaciones y rúbricas</strong><p>Criterios claros para revisar comprensión y procedimientos.</p><span>Ver estructura <ChevronRight size={15}/></span></button></div></section>
+              <div className="teacher-roadmap-note"><Lightbulb size={20}/><p><strong>Más adelante:</strong> perfiles de docentes, aulas virtuales, asignación de tareas, entrega de trabajos, calificaciones, seguimiento por estudiante y materiales compartidos. Estas funciones necesitarán cuentas, permisos y una base de datos segura.</p></div>
+            </section>
+          ) : openedLesson ? (
+            <section className="content-lesson-page">
+              <button className="back-link" onClick={() => { setOpenedLesson(null); setLessonChoice(null); setLessonChecked(false) }}><ArrowLeft size={16} /> Volver a {openedLesson.subject}</button>
+              <div className="content-lesson-hero"><div className="eyebrow"><BookOpen size={15} /> {openedLesson.stage.toUpperCase()} · {openedLesson.year}</div><h1>{openedLesson.lesson.title}</h1><p>{openedLesson.lesson.objective}</p><div className="content-lesson-meta"><span><Clock3 size={15} /> {openedLesson.lesson.durationMinutes} minutos</span><span><Target size={15} /> Lección guiada</span>{completedLessons.includes(openedLesson.lesson.id) && <span className="completion-chip"><Check size={14}/> Completada</span>}</div></div>
+              <div className="content-lesson-grid">
+                <article className="content-lesson-card"><span className="section-kicker">1 · COMPRENDE LA IDEA</span><h2>Explicación</h2><p>{openedLesson.lesson.explanation}</p></article>
+                <article className="content-lesson-card example-card"><span className="section-kicker">2 · MIRA UN EJEMPLO</span><h2>Ejemplo resuelto</h2><p>{openedLesson.lesson.example}</p></article>
+              </div>
+              <article className="content-lesson-card lesson-steps-card"><span className="section-kicker">3 · SIGUE LOS PASOS</span><h2>Cómo resolverlo</h2><ol>{openedLesson.lesson.guidedSteps.map((step, index) => <li key={step}><span>{index + 1}</span>{step}</li>)}</ol></article>
+              <article className="content-lesson-card lesson-practice-card"><span className="section-kicker">4 · COMPRUEBA LO APRENDIDO</span><h2>{openedLesson.lesson.exercise.prompt}</h2><div className="content-answer-grid">{openedLesson.lesson.exercise.options.map((option, index) => <button key={option} disabled={lessonChecked} className={`content-answer ${lessonChecked && index === openedLesson.lesson.exercise.answerIndex ? 'correct' : ''} ${lessonChecked && lessonChoice === index && index !== openedLesson.lesson.exercise.answerIndex ? 'incorrect' : ''}`} onClick={() => setLessonChoice(index)}>{option}</button>)}</div>{!lessonChecked ? <button className="primary-button" disabled={lessonChoice === null} onClick={() => { setLessonChecked(true); if (lessonChoice === openedLesson.lesson.exercise.answerIndex && !completedLessons.includes(openedLesson.lesson.id)) setCompletedLessons((current) => [...current, openedLesson.lesson.id]) }}>Comprobar respuesta <Check size={17}/></button> : <div className={`content-answer-feedback ${lessonChoice === openedLesson.lesson.exercise.answerIndex ? 'good' : 'help'}`} role="status"><strong>{lessonChoice === openedLesson.lesson.exercise.answerIndex ? '¡Muy bien!' : 'Vamos a revisarlo'}</strong><p>{openedLesson.lesson.exercise.explanation}</p><button className="secondary-button" onClick={() => { setLessonChoice(null); setLessonChecked(false) }}>Intentar de nuevo</button></div>}</article>
+              {completedLessons.includes(openedLesson.lesson.id) && nextLesson && <div className="next-lesson-strip"><div><span className="section-kicker">SIGUIENTE PASO</span><strong>{nextLesson.lesson.title}</strong><p>{nextLesson.stage} · {nextLesson.year} · {nextLesson.lesson.durationMinutes} min</p></div><button className="primary-button" onClick={() => { setOpenedLesson(nextLesson); setLessonChoice(null); setLessonChecked(false); window.scrollTo({ top: 0, behavior: 'smooth' }) }}>Siguiente lección <ChevronRight size={17}/></button></div>}
+              <div className="stage-roadmap-note"><div><NotebookPen size={20}/></div><p><strong>Contenido inicial de Garrett Math.</strong> Las lecciones se están separando de la interfaz para que después podamos administrarlas desde una biblioteca y una base de datos. Esta muestra todavía no guarda calificaciones en una cuenta.</p></div>
+            </section>
+          ) : selectedStage ? (
+            <section className="stage-page">
+              <button className="back-link" onClick={() => { setSelectedStage(null); setSelectedYear(''); navigate(routes.studentHome) }}><ArrowLeft size={16} /> Volver al inicio</button>
+              <div className="stage-hero">
+                <div className="stage-hero-copy"><div className="eyebrow"><Sparkles size={15} /> TU ESPACIO DE APRENDIZAJE</div><div className="stage-heading-row"><h1>Matemáticas de <span>{selectedStage.toLowerCase()}</span></h1><span className="stage-age">{stageInfo[selectedStage].age}</span></div><p className="welcome-description">{stageInfo[selectedStage].description}</p><div className="stage-quick-stats"><span><BookOpen size={15} /> {stageInfo[selectedStage].subjects.length} áreas de estudio</span><span><Target size={15} /> A tu propio ritmo</span></div></div>
+                <div className={`stage-hero-art ${stageInfo[selectedStage].color}`}><div className="stage-art-circle"><GraduationCap size={54} /></div><span className="stage-art-symbol symbol-one">＋</span><span className="stage-art-symbol symbol-two">÷</span><span className="stage-art-symbol symbol-three">π</span></div>
+              </div>
+              <div className="stage-year-panel"><div><span className="section-kicker">PERSONALIZA TU RECORRIDO</span><h2>¿Qué curso estás estudiando?</h2><p>Elige un año o curso para ver contenido adaptado a tu nivel.</p></div><label className="year-select-label">Curso o año<select value={selectedYear || stageInfo[selectedStage].years[0]} onChange={(e) => setSelectedYear(e.target.value)}>{stageInfo[selectedStage].years.map((year) => <option key={year}>{year}</option>)}</select></label></div>
+              <div className="stage-courses-heading"><div><span className="section-kicker">TODOS LOS CURSOS DE {selectedStage.toUpperCase()}</span><h2>Explora tu etapa completa</h2><p>Tu grado actual está guardado en el perfil, pero puedes entrar a cualquier otro curso de esta misma etapa.</p></div></div>
+              <div className="stage-course-grid">{stageInfo[selectedStage].years.map((year, index) => <button type="button" key={year} className={`stage-course-card ${selectedYear === year ? 'current' : ''}`} onClick={() => setSelectedYear(year)}><span className="stage-course-number">{String(index + 1).padStart(2, '0')}</span><span className="stage-course-copy"><strong>{year}</strong><small>{selectedYear === year ? 'Curso seleccionado' : 'Explorar contenidos'}</small></span><ChevronRight size={18}/></button>)}</div>
+              <div className="stage-section-heading"><div><span className="section-kicker">TU PLAN DE ESTUDIO</span><h2>Explora las áreas matemáticas</h2><p>Elige un tema para descubrir sus lecciones y actividades.</p></div></div>
+              <div className="subject-grid">{stageInfo[selectedStage].subjects.map((subject, index) => { const SubjectIcon = [Calculator, Atom, Target, BookOpen, Brain, Compass][index % 6]; return <article className="subject-card" key={subject}><div className={`subject-icon ${stageInfo[selectedStage].color}`}><SubjectIcon size={22} /></div><div className="subject-card-copy"><span>ÁREA {String(index + 1).padStart(2, '0')}</span><h3>{subject}</h3><p>{index === 0 ? 'Empieza por los conceptos esenciales y avanza con ejemplos guiados.' : 'Teoría, ejemplos resueltos y ejercicios de práctica estarán organizados aquí.'}</p></div><button aria-label={`Explorar ${subject}`} onClick={() => { const course = starterCourses.find((item) => item.stage === selectedStage && item.name === (selectedYear || stageInfo[selectedStage].years[0])); const lessonSubject = course?.subjects.find((item) => item.title.toLowerCase() === subject.toLowerCase() || item.title.toLowerCase().includes(subject.toLowerCase()) || subject.toLowerCase().includes(item.title.toLowerCase())); const lesson = lessonSubject?.lessons[0]; if (lesson && course) { setOpenedLesson({ stage: selectedStage, subject, year: selectedYear || course.name, lesson }); setLessonChoice(null); setLessonChecked(false); window.scrollTo({ top: 0, behavior: 'smooth' }) } else if (selectedStage === 'Preescolar' && index === 0) { startLesson() } else { announce(`«${subject}» está en la biblioteca planificada. En esta versión incluimos una lección de muestra para el área inicial de cada etapa.`) } }}><ChevronRight size={18} /></button></article> })}</div>
+              <div className="stage-bottom-grid"><article className="stage-goal-card"><div className="stage-card-icon"><Target size={21} /></div><div><span className="section-kicker">OBJETIVO DE ESTA ETAPA</span><h3>¿Qué vas a aprender?</h3><p>{stageInfo[selectedStage].goal}</p></div></article><article className="stage-study-card"><div className="stage-card-icon"><CalendarDays size={21} /></div><div><span className="section-kicker">RUTINA SUGERIDA</span><h3>Pequeños pasos, grandes avances</h3><p>Prueba sesiones cortas y regulares. Tu progreso se podrá guardar en tu perfil cuando activemos las cuentas.</p></div></article></div>
+              <div className="stage-roadmap-note"><div><NotebookPen size={20} /></div><p><strong>Una ruta que crece contigo.</strong> Cada área tendrá explicaciones, ejemplos resueltos, ejercicios con pistas, evaluaciones y recomendaciones según tus avances.</p></div>
+            </section>
+          ) : (
+          <>
+          <section className="welcome-row">
+            <div>
+              <div className="eyebrow"><Sparkles size={15} /> TU CAMINO DE APRENDIZAJE</div>
+              <h1>Las matemáticas<br className="mobile-break" /> empiezan <span>contigo.</span></h1>
+              <p className="welcome-description">Explora, practica y descubre que puedes llegar mucho más lejos de lo que imaginas.</p>
+            </div>
+            <div className="welcome-art" aria-hidden="true">
+              <div className="orbit orbit-one" /><div className="orbit orbit-two" />
+              <div className="math-tile tile-plus">+</div><div className="math-tile tile-equals">=</div>
+              <div className="math-tile tile-pi">π</div><div className="math-tile tile-root">√</div>
+              <div className="art-center"><GraduationCap size={51} strokeWidth={1.7} /></div>
+              <span className="sparkle sparkle-a">✦</span><span className="sparkle sparkle-b">✳</span>
+            </div>
+          </section>
+
+          <section className="stats-grid" aria-label="Resumen de aprendizaje">
+            <div className="stat-card"><div className="stat-icon stat-mint"><BookOpen size={20} /></div><div><span>Rutas disponibles</span><strong>5</strong><small>Para diferentes niveles</small></div></div>
+            <div className="stat-card"><div className="stat-icon stat-purple"><Target size={20} /></div><div><span>Tu próximo objetivo</span><strong>1 lección</strong><small>Empieza cuando quieras</small></div></div>
+            <div className="stat-card"><div className="stat-icon stat-yellow"><Star size={20} /></div><div><span>Tu motivación</span><strong>En marcha</strong><small>Cada intento cuenta</small></div></div>
+          </section>
+
+          <section className="continue-card">
+            <div className="continue-illustration"><div className="book-shape"><BookOpen size={38} /></div><span className="floating-number">1 2 3</span><span className="floating-dot dot-one" /><span className="floating-dot dot-two" /></div>
+            <div className="continue-copy"><span className="section-kicker">RECOMENDADO PARA EMPEZAR</span><h2>Contar también es descubrir</h2><p>Reconoce los números y practica contando objetos con una actividad sencilla.</p><div className="lesson-meta"><span><BookOpen size={15} /> 5 preguntas de práctica</span><span><Clock3 size={15} /> 3–5 minutos</span></div></div>
+            <button className="primary-button continue-button" onClick={startLesson}>Comenzar lección <ChevronRight size={18} /></button>
+          </section>
+
+          <section className="courses-section">
+            <div className="section-heading"><div><span className="section-kicker">UN MUNDO POR DESCUBRIR</span><h2>Explora las rutas matemáticas</h2><p>Entra en una etapa para encontrar cursos y contenidos pensados para tu nivel.</p></div><button className="text-button" onClick={() => { setActiveLevel('Todos'); setShowAll(!showAll); }}>{showAll ? 'Ver selección' : 'Ver todas'} <ChevronRight size={16} /></button></div>
+            <div className="course-grid">
+              {filteredCourses.map((course) => {
+                const Icon = course.icon
+                return <article className="course-card" key={course.title}>
+                  <div className={`course-art ${course.color}`}><div className="course-art-icon"><Icon size={29} strokeWidth={1.8} /></div><span className="course-level">{course.level}</span></div>
+                  <div className="course-body"><span className="course-subject">{course.subject}</span><h3>{course.title}</h3><div className="course-progress-label"><span>{course.progress ? `${course.progress}% completado` : 'Aún por comenzar'}</span><span>{course.done}/{course.lessons}</span></div><div className="course-progress"><span style={{ width: `${course.progress}%` }} /></div><button className="course-link" onClick={() => { setSelectedStage(course.level as Level); setSelectedYear(stageInfo[course.level as Level].years[0]); setStageMenuOpen(true); navigate(routes.studentCourses); window.scrollTo({ top: 0, behavior: 'smooth' }) }}>{course.progress ? 'Continuar ruta' : 'Explorar etapa'} <ChevronRight size={16} /></button></div>
+                </article>
+              })}
+              {filteredCourses.length === 0 && <div className="empty-state"><Search size={25} /><strong>No encontramos ese tema</strong><span>Prueba con otra palabra o elige otro nivel.</span></div>}
+            </div>
+          </section>
+
+          <section className="future-banner"><div className="future-icon"><Brain size={23} /></div><div><strong>Aprender con ayuda, cuando la necesites.</strong><p>Estamos preparando un tutor que pueda explicarte los ejercicios paso a paso.</p></div><span className="future-pill"><LockKeyhole size={13} /> Próximamente</span></section>
+          <footer className="footer"><span>© 2026 Garrett Math · Nombre provisional</span><span>Aprender es un proceso, no una carrera. <span className="footer-heart">♥</span></span></footer>
+          </>
+          )}
+        </div>
+      </main>
+
+      {notice && <div className="toast" role="status"><Check size={17} />{notice}</div>}
+    </div>
+  )
+}
+
+export default App

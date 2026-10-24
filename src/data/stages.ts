@@ -1,0 +1,9 @@
+import { Atom, BookOpen, Brain, Calculator, Star } from 'lucide-react'
+import type { Level, StageInfo } from '../types/models'
+
+export const stageInfo: Record<Level, StageInfo> = {
+  Preescolar: { description: 'Descubre los números jugando, observando y contando objetos de tu entorno.', age: '3–5 años', years: ['3 años', '4 años', '5 años'], subjects: ['Números y conteo', 'Formas y colores', 'Patrones', 'Comparar cantidades'], goal: 'Reconocer números y cantidades pequeñas con confianza.', icon: Star, color: 'mint' },
+  Primaria: { description: 'Construye una base matemática sólida con ejemplos, juegos y práctica guiada.', age: '6–11 años', years: ['1.º grado', '2.º grado', '3.º grado', '4.º grado', '5.º grado', '6.º grado'], subjects: ['Aritmética', 'Sumas y restas', 'Multiplicación y división', 'Fracciones', 'Geometría', 'Medidas y datos'], goal: 'Resolver problemas cotidianos y comprender por qué funcionan las operaciones.', icon: BookOpen, color: 'lavender' },
+  Secundaria: { description: 'Comprende las ideas detrás de las fórmulas y aprende a resolver problemas paso a paso.', age: '12–17 años', years: ['1.º año', '2.º año', '3.º año', '4.º año', '5.º año'], subjects: ['Números reales', 'Álgebra', 'Ecuaciones', 'Geometría', 'Funciones', 'Estadística y probabilidad'], goal: 'Conectar conceptos, modelar situaciones y desarrollar razonamiento algebraico.', icon: Atom, color: 'blue' },
+  Universidad: { description: 'Profundiza en los fundamentos matemáticos con teoría, demostraciones y aplicaciones.', age: 'Nivel superior', years: ['Curso inicial', 'Cálculo I', 'Cálculo II', 'Álgebra lineal', 'Probabilidad'], subjects: ['Precálculo', 'Cálculo diferencial', 'Cálculo integral', 'Álgebra lineal', 'Matemática discreta', 'Estadística'], goal: 'Desarrollar pensamiento formal y aplicar herramientas matemáticas a problemas complejos.', icon: Brain, color: 'pink' },
+}
