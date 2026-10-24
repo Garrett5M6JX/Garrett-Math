@@ -74,10 +74,10 @@ function App() {
     let alive = true
     const restoreSession = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession()
+        const { data: { session } } = await supabase!.auth.getSession()
         if (!session?.user || !alive) { if (alive) { setAccount(null); try { localStorage.removeItem('garrett-math-demo-account') } catch { /* opcional */ }; setAuthReady(true) }; return }
         const user = session.user
-        const { data: profile } = await supabase.from('user_profiles').select('display_name, education_stage, education_year').eq('id', user.id).maybeSingle()
+        const { data: profile } = await supabase!.from('user_profiles').select('display_name, education_stage, education_year').eq('id', user.id).maybeSingle()
         if (!alive) return
         const metadata = user.user_metadata || {}
         const role: AccountRole = user.app_metadata?.assigned_role === 'teacher' ? 'teacher' : metadata.requested_role === 'parent' ? 'parent' : 'student'
@@ -87,16 +87,16 @@ function App() {
         if (profile?.education_stage && LEVEL_OPTIONS.includes(profile.education_stage as Level)) setSelectedStage(profile.education_stage as Level)
         if (profile?.education_year) setSelectedYear(profile.education_year)
         if (role === 'parent') {
-          const { data: children } = await supabase.from('child_profiles').select('id, display_alias, education_stage, education_year').eq('guardian_id', user.id).order('created_at', { ascending: true })
+          const { data: children } = await supabase!.from('child_profiles').select('id, display_alias, education_stage, education_year').eq('guardian_id', user.id).order('created_at', { ascending: true })
           if (alive && children) setChildProfiles(children.map((child: { id: string; display_alias: string; education_stage: Level; education_year: string }) => ({ id: child.id, name: child.display_alias, stage: child.education_stage, year: child.education_year })))
         }
-        const { data: progress } = await supabase.from('learning_progress').select('lesson_id, status').eq('user_id', user.id).eq('status', 'completed')
+        const { data: progress } = await supabase!.from('learning_progress').select('lesson_id, status').eq('user_id', user.id).eq('status', 'completed')
         if (alive && progress) setCompletedLessons(progress.map((item: { lesson_id: string }) => item.lesson_id))
       } catch (error) { console.error('No se pudo restaurar la sesión de Garrett Math:', error) }
       finally { if (alive) setAuthReady(true) }
     }
     void restoreSession()
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: listener } = supabase!.auth.onAuthStateChange((_event, session) => {
       if (!session) { setAccount(null); try { localStorage.removeItem('garrett-math-demo-account') } catch { /* opcional */ } }
     })
     return () => { alive = false; listener.subscription.unsubscribe() }
@@ -190,10 +190,10 @@ function App() {
     if (!supabase || !account) return
     let alive = true
     const syncProfile = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { user } } = await supabase!.auth.getUser()
       if (!user || !alive) return
       const payload = { id: user.id, display_name: account.name.slice(0, 100), education_stage: selectedStage || null, education_year: selectedYear || null, updated_at: new Date().toISOString() }
-      const { error } = await supabase.from('user_profiles').upsert(payload, { onConflict: 'id' })
+      const { error } = await supabase!.from('user_profiles').upsert(payload, { onConflict: 'id' })
       if (error) console.error('No se pudo sincronizar el perfil:', error.message)
     }
     void syncProfile()
@@ -204,14 +204,14 @@ function App() {
     if (!supabase || account?.role !== 'parent') return
     let alive = true
     const syncChildren = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { user } } = await supabase!.auth.getUser()
       if (!user || !alive) return
       const localOnly = childProfiles.filter(child => typeof child.id === 'string' && child.id.startsWith('local-'))
       for (const child of localOnly) {
-        const { error } = await supabase.from('child_profiles').insert({ guardian_id: user.id, display_alias: child.name, education_stage: child.stage, education_year: child.year })
+        const { error } = await supabase!.from('child_profiles').insert({ guardian_id: user.id, display_alias: child.name, education_stage: child.stage, education_year: child.year })
         if (error) console.error('No se pudo guardar el perfil infantil:', error.message)
       }
-      const { data: updated } = await supabase.from('child_profiles').select('id, display_alias, education_stage, education_year').eq('guardian_id', user.id).order('created_at', { ascending: true })
+      const { data: updated } = await supabase!.from('child_profiles').select('id, display_alias, education_stage, education_year').eq('guardian_id', user.id).order('created_at', { ascending: true })
       if (alive && updated) setChildProfiles(updated.map((child: { id: string; display_alias: string; education_stage: Level; education_year: string }) => ({ id: child.id, name: child.display_alias, stage: child.education_stage, year: child.education_year })))
     }
     void syncChildren()
@@ -222,10 +222,10 @@ function App() {
     if (!supabase || !account) return
     let alive = true
     const syncProgress = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { user } } = await supabase!.auth.getUser()
       if (!user || !alive) return
       for (const lessonId of completedLessons) {
-        const { error } = await supabase.from('learning_progress').upsert({ user_id: user.id, lesson_id: lessonId, status: 'completed', score: 100, updated_at: new Date().toISOString() }, { onConflict: 'user_id,lesson_id' })
+        const { error } = await supabase!.from('learning_progress').upsert({ user_id: user.id, lesson_id: lessonId, status: 'completed', score: 100, updated_at: new Date().toISOString() }, { onConflict: 'user_id,lesson_id' })
         if (error) { console.error('No se pudo sincronizar el progreso:', error.message); break }
       }
     }
@@ -243,7 +243,7 @@ function App() {
     try {
       if (supabase) {
         if (authView === 'register') {
-          const { data, error } = await supabase.auth.signUp({
+          const { data, error } = await supabase!.auth.signUp({
             email: authEmail.trim(), password: authPassword,
             options: { data: { display_name: authName.trim(), requested_role: accountRole, age_declaration_confirmed: ageDeclared } },
           })
@@ -253,17 +253,17 @@ function App() {
             setAuthView('login'); navigate(authPath.login); return
           }
         } else {
-          const { error } = await supabase.auth.signInWithPassword({ email: authEmail.trim(), password: authPassword })
+          const { error } = await supabase!.auth.signInWithPassword({ email: authEmail.trim(), password: authPassword })
           if (error) throw error
         }
-        const { data: userData } = await supabase.auth.getUser()
+        const { data: userData } = await supabase!.auth.getUser()
         const user = userData.user
         const metadata = user?.user_metadata || {}
         const requestedRole = metadata.requested_role
         const safeRole: AccountRole = user?.app_metadata?.assigned_role === 'teacher' ? 'teacher' : requestedRole === 'parent' ? 'parent' : 'student'
         const nextAccount: DemoAccount = { name: String(metadata.display_name || authName.trim() || authEmail.split('@')[0]), email: authEmail.trim(), role: safeRole, ageDeclared: Boolean(metadata.age_declaration_confirmed ?? ageDeclared) }
         if (user) {
-          const { error: profileError } = await supabase.from('user_profiles').upsert({ id: user.id, display_name: nextAccount.name.slice(0, 100), updated_at: new Date().toISOString() }, { onConflict: 'id' })
+          const { error: profileError } = await supabase!.from('user_profiles').upsert({ id: user.id, display_name: nextAccount.name.slice(0, 100), updated_at: new Date().toISOString() }, { onConflict: 'id' })
           if (profileError) throw new Error(`La cuenta se autenticó, pero no se pudo guardar el perfil: ${profileError.message}`)
         }
         setAccount(nextAccount)
@@ -281,7 +281,7 @@ function App() {
       setAuthError(error instanceof Error ? error.message : 'No se pudo iniciar sesión. Revisa la configuración de Supabase.')
     } finally { setAuthBusy(false) }
   }
-  const signOut = () => { if (supabase) void supabase.auth.signOut(); setAccount(null); try { localStorage.removeItem('garrett-math-demo-account') } catch { /* almacenamiento opcional */ }; navigateAuth('welcome'); navigate('/'); setAuthError(''); setSelectedStage(null); setOpenedLesson(null); setProfileOpen(false) }
+  const signOut = () => { if (supabase) void supabase!.auth.signOut(); setAccount(null); try { localStorage.removeItem('garrett-math-demo-account') } catch { /* almacenamiento opcional */ }; navigateAuth('welcome'); navigate('/'); setAuthError(''); setSelectedStage(null); setOpenedLesson(null); setProfileOpen(false) }
   useEffect(() => {
     if (!authReady) return
     const path = window.location.pathname
@@ -300,13 +300,13 @@ function App() {
   if (!authReady) return <div className="auth-shell"><div className="auth-card"><Brand /><p>Verificando tu sesión segura…</p></div></div>
 
   if (!account || authView === 'student-setup') {
-    const finishStudentSetup = async () => { const year = setupYear || stageInfo[setupStage].years[0]; setSelectedStage(setupStage); setSelectedYear(year); setActiveLevel(setupStage); if (supabase) { const { data: { user } } = await supabase.auth.getUser(); if (user) { const { error } = await supabase.from('user_profiles').upsert({ id: user.id, display_name: account?.name?.slice(0, 100) || 'Estudiante', education_stage: setupStage, education_year: year, updated_at: new Date().toISOString() }, { onConflict: 'id' }); if (error) { setAuthError(`No se pudo guardar tu perfil: ${error.message}`); return } } } setAuthView('welcome'); navigate(routes.studentHome) }
+    const finishStudentSetup = async () => { const year = setupYear || stageInfo[setupStage].years[0]; setSelectedStage(setupStage); setSelectedYear(year); setActiveLevel(setupStage); if (supabase) { const { data: { user } } = await supabase!.auth.getUser(); if (user) { const { error } = await supabase!.from('user_profiles').upsert({ id: user.id, display_name: account?.name?.slice(0, 100) || 'Estudiante', education_stage: setupStage, education_year: year, updated_at: new Date().toISOString() }, { onConflict: 'id' }); if (error) { setAuthError(`No se pudo guardar tu perfil: ${error.message}`); return } } } setAuthView('welcome'); navigate(routes.studentHome) }
     return <div className="auth-shell"><div className="auth-card"><Brand />
       {authView === 'student-setup' && account ? <><span className="auth-kicker">PERSONALIZA TU RECORRIDO</span><h1>¡Hola, {account.name}!</h1><p>Selecciona tu etapa y curso. Podrás revisarlos desde tu perfil.</p><CustomSelect label="Etapa educativa" value={setupStage} options={LEVEL_OPTIONS.map(x => ({ label: x, value: x }))} onChange={value => { const stage = value as Level; setSetupStage(stage); setSetupYear(stageInfo[stage].years[0]) }} /><CustomSelect label="Curso o año" value={setupYear} options={stageInfo[setupStage].years.map(x => ({ label: x, value: x }))} onChange={setSetupYear} /><button className="auth-primary" onClick={finishStudentSetup}>Entrar a mi espacio <ChevronRight size={18}/></button></> : authView === 'welcome' ? <><span className="auth-kicker">TU FUTURO EMPIEZA AQUÍ</span><h1>Las matemáticas empiezan <em>contigo.</em></h1><p>Un espacio para explorar, practicar y crecer a tu propio ritmo.</p><div className="auth-feature-list"><div><BookOpen/><span><b>Aprende por etapas</b><small>Desde preescolar hasta universidad</small></span></div><div><Target/><span><b>Practica con propósito</b><small>Lecciones y progreso sincronizado</small></span></div><div><Users/><span><b>Espacios para cada rol</b><small>Estudiantes, docentes y familias</small></span></div></div><button className="auth-primary" onClick={() => navigateAuth('role')}>Crear una cuenta <ChevronRight size={18}/></button><button className="auth-secondary" onClick={() => { navigateAuth('login'); setAccountRole('student') }}>Ya tengo una cuenta</button><p className="auth-demo-note"><LockKeyhole size={14}/> Las cuentas se guardan en Supabase cuando está configurado; si no, se usa el modo local.</p></> : authView === 'role' ? <><button className="auth-back" onClick={() => navigateAuth('welcome')}><ArrowLeft size={16}/> Volver</button><span className="auth-kicker">TIPO DE CUENTA</span><h1>¿Cómo usarás Garrett Math?</h1><p>Elegiremos el espacio adecuado para ti.</p><div className="role-options">{([{id:'student',title:'Estudiante',desc:'Aprender y seguir mi progreso',icon:GraduationCap},{id:'teacher',title:'Profesor/a',desc:'Preparar clases y recursos',icon:Presentation},{id:'parent',title:'Representante',desc:'Administrar perfiles infantiles',icon:Users}] as const).map(r => <button key={r.id} className="role-option" onClick={() => { setAccountRole(r.id); navigateAuth('register'); setAuthError('') }}><r.icon size={23}/><span><b>{r.title}</b><small>{r.desc}</small></span><ChevronRight size={18}/></button>)}</div></> : <><button className="auth-back" onClick={() => { navigateAuth(authView === 'login' ? 'welcome' : 'role'); setAuthError('') }}><ArrowLeft size={16}/> Volver</button><span className="auth-kicker">{authView === 'register' ? 'CREAR PERFIL' : 'BIENVENIDO DE NUEVO'}</span><h1>{authView === 'register' ? 'Comencemos.' : 'Inicia sesión.'}</h1><p>{authView === 'register' ? `Cuenta de ${accountRole === 'student' ? 'estudiante' : accountRole === 'teacher' ? 'profesor/a' : 'representante'} ${supabaseConfigured ? 'con Supabase' : 'en modo local'}.` : supabaseConfigured ? 'Accede con tu cuenta de Supabase.' : 'Accede a una sesión de demostración en este dispositivo.'}</p><form onSubmit={demoSignIn} className="auth-form">{authView === 'register' && <label>Nombre o alias<input value={authName} onChange={e => setAuthName(e.target.value)} autoComplete="name" required placeholder="Cómo te llamamos"/></label>}<label>Correo electrónico<input type="email" value={authEmail} onChange={e => setAuthEmail(e.target.value)} autoComplete="email" required placeholder="tu@correo.com"/></label><label>{supabaseConfigured ? 'Contraseña' : 'Contraseña de demostración'}<input type="password" value={authPassword} onChange={e => setAuthPassword(e.target.value)} autoComplete={authView === 'login' ? 'current-password' : 'new-password'} minLength={6} required placeholder="Al menos 6 caracteres"/></label><label className="age-confirm"><input type="checkbox" checked={ageDeclared} onChange={e => setAgeDeclared(e.target.checked)}/><span>Confirmo la declaración de edad para continuar. Entiendo que esto <b>no equivale a consentimiento parental</b> ni sustituye los requisitos legales aplicables.</span></label>{authError && <p className="auth-error" role="alert">{authError}</p>}<button className="auth-primary" type="submit" disabled={authBusy}>{authBusy ? 'Procesando…' : supabaseConfigured ? (authView === 'register' ? 'Crear cuenta' : 'Iniciar sesión') : 'Continuar en modo demo'} <ChevronRight size={18}/></button></form><button className="auth-link" onClick={() => setAuthError('La recuperación de contraseña estará disponible al conectar un proveedor de autenticación real (por ejemplo, Supabase).')}>¿Olvidaste tu contraseña?</button>{authError && authView !== 'register' && <p className="auth-error" role="status">{authError}</p>}<p className="auth-demo-note"><LockKeyhole size={14}/> {supabaseConfigured ? 'Autenticación mediante Supabase. Configura confirmación de correo y políticas de seguridad antes de producción.' : 'No se envían credenciales a ningún servidor.'}</p></>}
     </div><footer className="auth-footer">Garrett Math v9.1.2 · Autenticación y sincronización</footer></div>
   }
 
-  if (account.role === 'parent') return <div className="auth-shell parent-shell"><div className="auth-card parent-card"><Brand family subtitle="Espacio familiar" action={<button className="auth-logout" onClick={signOut}>Cerrar sesión</button>} /><span className="auth-kicker">PERFILES EDUCATIVOS</span><h1>Hola, {account.name}</h1><p>Crea perfiles con alias; no hace falta que cada niño se registre por su cuenta.</p><form className="child-form" onSubmit={async e => { e.preventDefault(); if (!childName.trim()) return; const name = childName.trim(); if (supabase) { const { data: { user } } = await supabase.auth.getUser(); if (!user) { setAuthError('Tu sesión ha caducado. Inicia sesión de nuevo.'); return } const { data, error } = await supabase.from('child_profiles').insert({ guardian_id: user.id, display_alias: name.slice(0, 100), education_stage: childStage, education_year: childYear }).select('id, display_alias, education_stage, education_year').single(); if (error) { setAuthError(`No se pudo guardar el perfil infantil: ${error.message}`); return } if (data) setChildProfiles(old => [...old, { id: data.id, name: data.display_alias, stage: data.education_stage as Level, year: data.education_year }]) } else setChildProfiles(old => [...old, { id: `local-${Date.now()}`, name, stage: childStage, year: childYear }]); setChildName('') }}><label>Nombre o alias del perfil infantil<input value={childName} onChange={e => setChildName(e.target.value)} placeholder="Ej. Peque explorador" required/></label><label>Etapa<select value={childStage} onChange={e => { const stage = e.target.value as Level; setChildStage(stage); setChildYear(stageInfo[stage].years[0]) }}>{LEVEL_OPTIONS.map(x => <option key={x}>{x}</option>)}</select></label><label>Curso o año<select value={childYear} onChange={e => setChildYear(e.target.value)}>{stageInfo[childStage].years.map(x => <option key={x}>{x}</option>)}</select></label><button className="auth-primary" type="submit">Añadir perfil <Users size={17}/></button></form><h2>Perfiles de este dispositivo</h2>{childProfiles.length ? <div className="child-profile-list">{childProfiles.map(child => <article key={child.id}><div className="child-avatar"><UserRound/></div><div><b>{child.name}</b><small>{child.stage} · {child.year}</small><small>Perfil educativo</small></div><button aria-label={`Eliminar perfil ${child.name}`} onClick={async () => { if (supabase && typeof child.id === 'string' && !child.id.startsWith('local-')) { const { data: { user } } = await supabase.auth.getUser(); if (user) { const { error } = await supabase.from('child_profiles').delete().eq('id', child.id).eq('guardian_id', user.id); if (error) { setAuthError(`No se pudo eliminar el perfil: ${error.message}`); return } } } setChildProfiles(old => old.filter(x => x.id !== child.id)) }}><X size={17}/></button></article>)}</div> : <div className="parent-empty"><Users size={26}/><b>Aún no hay perfiles</b><span>Aquí aparecerán los perfiles educativos que agregues.</span></div>}<p className="auth-demo-note"><LockKeyhole size={14}/> Los perfiles se sincronizan con tu cuenta cuando Supabase está conectado.</p></div><footer className="auth-footer">Garrett Math v9.1.2 · Espacio familiar</footer></div>
+  if (account.role === 'parent') return <div className="auth-shell parent-shell"><div className="auth-card parent-card"><Brand family subtitle="Espacio familiar" action={<button className="auth-logout" onClick={signOut}>Cerrar sesión</button>} /><span className="auth-kicker">PERFILES EDUCATIVOS</span><h1>Hola, {account.name}</h1><p>Crea perfiles con alias; no hace falta que cada niño se registre por su cuenta.</p><form className="child-form" onSubmit={async e => { e.preventDefault(); if (!childName.trim()) return; const name = childName.trim(); if (supabase) { const { data: { user } } = await supabase!.auth.getUser(); if (!user) { setAuthError('Tu sesión ha caducado. Inicia sesión de nuevo.'); return } const { data, error } = await supabase!.from('child_profiles').insert({ guardian_id: user.id, display_alias: name.slice(0, 100), education_stage: childStage, education_year: childYear }).select('id, display_alias, education_stage, education_year').single(); if (error) { setAuthError(`No se pudo guardar el perfil infantil: ${error.message}`); return } if (data) setChildProfiles(old => [...old, { id: data.id, name: data.display_alias, stage: data.education_stage as Level, year: data.education_year }]) } else setChildProfiles(old => [...old, { id: `local-${Date.now()}`, name, stage: childStage, year: childYear }]); setChildName('') }}><label>Nombre o alias del perfil infantil<input value={childName} onChange={e => setChildName(e.target.value)} placeholder="Ej. Peque explorador" required/></label><label>Etapa<select value={childStage} onChange={e => { const stage = e.target.value as Level; setChildStage(stage); setChildYear(stageInfo[stage].years[0]) }}>{LEVEL_OPTIONS.map(x => <option key={x}>{x}</option>)}</select></label><label>Curso o año<select value={childYear} onChange={e => setChildYear(e.target.value)}>{stageInfo[childStage].years.map(x => <option key={x}>{x}</option>)}</select></label><button className="auth-primary" type="submit">Añadir perfil <Users size={17}/></button></form><h2>Perfiles de este dispositivo</h2>{childProfiles.length ? <div className="child-profile-list">{childProfiles.map(child => <article key={child.id}><div className="child-avatar"><UserRound/></div><div><b>{child.name}</b><small>{child.stage} · {child.year}</small><small>Perfil educativo</small></div><button aria-label={`Eliminar perfil ${child.name}`} onClick={async () => { if (supabase && typeof child.id === 'string' && !child.id.startsWith('local-')) { const { data: { user } } = await supabase!.auth.getUser(); if (user) { const { error } = await supabase!.from('child_profiles').delete().eq('id', child.id).eq('guardian_id', user.id); if (error) { setAuthError(`No se pudo eliminar el perfil: ${error.message}`); return } } } setChildProfiles(old => old.filter(x => x.id !== child.id)) }}><X size={17}/></button></article>)}</div> : <div className="parent-empty"><Users size={26}/><b>Aún no hay perfiles</b><span>Aquí aparecerán los perfiles educativos que agregues.</span></div>}<p className="auth-demo-note"><LockKeyhole size={14}/> Los perfiles se sincronizan con tu cuenta cuando Supabase está conectado.</p></div><footer className="auth-footer">Garrett Math v9.1.2 · Espacio familiar</footer></div>
 
   if (lessonOpen) {
     const question = lessonQuestions[questionIndex]
