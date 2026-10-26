@@ -1,4 +1,4 @@
-import { Atom, BookOpen, Brain, Calculator, Star } from 'lucide-react'
+import { Atom, BookOpen, Brain, Star } from 'lucide-react'
 import type { Level, StageInfo } from '../types/models'
 
 export const stageInfo: Record<Level, StageInfo> = {
