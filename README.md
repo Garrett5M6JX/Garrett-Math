@@ -1,4 +1,4 @@
-# Garrett Math v10.0.0 — Biblioteca de matemáticas
+# Garrett Math v11.0.0 — Panel administrativo
 
 Plataforma educativa construida con React 18, TypeScript, Vite, CSS y Lucide. La versión 10 añade la **Biblioteca de matemáticas** (Preescolar y Primaria) sobre la aplicación existente, sin eliminar ninguna de sus páginas.
 
@@ -19,7 +19,7 @@ Plataforma educativa construida con React 18, TypeScript, Vite, CSS y Lucide. La
 ## Instalar y ejecutar en Windows con VS Code
 
 1. Instala **Node.js LTS (20 o superior)** desde <https://nodejs.org> y **Git**.
-2. Descomprime el ZIP, abre la carpeta `Garrett_Math_v10` en VS Code (*Archivo → Abrir carpeta*) y abre una terminal (*Terminal → Nueva terminal*).
+2. Descomprime el ZIP, abre la carpeta `Garrett_Math_v11_Admin` en VS Code (*Archivo → Abrir carpeta*) y abre una terminal (*Terminal → Nueva terminal*).
 3. Ejecuta:
 
 ```bash
@@ -56,14 +56,14 @@ Solo la URL y la clave **anon/publishable** pueden estar en el navegador. **Nunc
 
 En la carpeta de tu repositorio actual (la que contiene `.git`):
 
-1. Copia el contenido de `Garrett_Math_v10` sobre el repositorio (sustituye `src/`, `README.md`, etc.; **no copies ni borres `.git`**). Si quieres conservar la v9, antes ejecuta `git checkout -b v10-biblioteca`.
+1. Copia el contenido de `Garrett_Math_v11_Admin` sobre el repositorio (sustituye `src/`, `README.md`, etc.; **no copies ni borres `.git`**). Si quieres conservar la v9, antes ejecuta `git checkout -b v11-admin`.
 2. Revisa que no se suban secretos: `git status` no debe listar `.env.local` ni `node_modules`.
 3. Sube:
 
 ```bash
 git add .
-git commit -m "Garrett Math v10: Biblioteca de matemáticas (Preescolar y Primaria)"
-git push            # o: git push -u origin v10-biblioteca
+git commit -m "Garrett Math v11: panel administrativo"
+git push            # o: git push -u origin v11-admin
 ```
 
 Si alguna vez subiste un `.env` por error: `git rm --cached .env.local` y **rota la clave** en Supabase.
@@ -143,3 +143,9 @@ Resultados reales y lo que **no** se pudo comprobar están en [`CHANGELOG.md`](C
 ## Historial
 
 `HOJA_DE_RUTA_GARRETT_MATH.md` es la hoja de ruta original (v9) y se conserva como referencia; la vigente es `ROADMAP.md`.
+
+## Garrett Math V11 — Panel administrativo
+
+La ruta `/admin` verifica el usuario autenticado y su presencia en `public.admin_users`; el modo demo nunca concede administración. Antes de usarlo, ejecuta `supabase/admin_v11.sql` y sigue los pasos de `docs/ADMIN.md` para registrar manualmente la primera cuenta administradora. No coloques `service_role` en el frontend.
+
+Esta entrega incluye edición remota básica y siembra del catálogo, pero la Biblioteca continúa usando el catálogo TypeScript local. La edición remota no cambia aún lo que ve el alumnado. La vista previa por rol, importación completa, historial de versiones y auditoría automática se consideran parciales o pendientes; consulta `docs/ADMIN.md` antes de desplegar.

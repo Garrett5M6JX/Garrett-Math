@@ -40,3 +40,17 @@ Leyenda: **[x] terminado en la v10** · **[ ] pendiente** · *(infra)* requiere 
 2. `npm test` y revisión manual en móvil y escritorio.
 3. Subir a GitHub (revisar que no haya `.env*`), desplegar una *preview* en Vercel Hobby y probarla.
 4. No declarar producción lista hasta completar los puntos de arriba.
+
+## V11 — Administración (base inicial)
+- [x] Ruta `/admin` con verificación en Supabase `admin_users`.
+- [x] SQL aditivo para jerarquía de catálogo, RLS, versiones y auditoría.
+- [x] Panel básico para listas remotas, siembra, edición JSON, estados y archivo/restauración.
+- [x] Exportación del catálogo local y validación previa de JSON.
+- [ ] Conectar `CatalogRepository` remoto al reproductor con fallback visible al catálogo local.
+- [ ] Validación completa antes de publicar, mensajes por campo y prevención de ciclos/prerrequisitos incompatibles.
+- [ ] Versionado y restauración real de lecciones; auditoría automática por cada mutación.
+- [ ] Borrado definitivo protegido con conteo de progreso y prerrequisitos.
+- [ ] Vista previa global por rol con banner persistente, bypass de redirecciones y ámbito `admin-preview` aislado.
+- [ ] Importación transaccional con diff/confirmación y cobertura curricular detallada.
+- [ ] Pruebas RLS con dos sesiones reales, pruebas de navegador y MFA verificado.
+- [ ] Gestión de usuarios Auth mediante Edge Function segura, solo si se solicita.

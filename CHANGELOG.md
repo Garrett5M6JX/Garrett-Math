@@ -65,3 +65,11 @@ Entorno de desarrollo **sin acceso a internet**: no se pudieron instalar las dep
 
 - Modelos, datos por etapa, marca compartida, selector, layout público y almacenamiento demo separados en módulos.
 - Rutas de navegación y perfil educativo editable.
+
+## [11.0.0] - 2026-10-28
+- Añadida ruta `/admin` con comprobación de sesión Supabase y tabla `admin_users`.
+- Añadido panel administrativo de navegación, catálogo remoto inicial, siembra idempotente, edición JSON básica, estados editoriales, archivo/restauración, exportación y validación de JSON.
+- Añadido SQL aditivo `supabase/admin_v11.sql`, script de inspección RLS y documentación `docs/ADMIN.md`.
+- Retirado del menú lateral el botón «Etapa», que duplicaba la navegación de la Biblioteca.
+- Añadidos avisos claros sobre funciones parciales y tareas pendientes.
+- Limitaciones conocidas: el reproductor aún usa el catálogo local; la vista previa por rol no tiene aislamiento integral de progreso; importación, historial/versiones y auditoría automática necesitan trabajo adicional.

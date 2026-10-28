@@ -39,3 +39,8 @@ Inspección del ZIP recibido (≈1 160 líneas de código fuente, sin `package-l
 ## No verificado
 
 Ver la sección de verificación del `CHANGELOG.md`.
+
+
+## Revisión para V11
+
+V11 añade una primera base del panel administrativo. Consulta `docs/ADMIN.md` para conocer las limitaciones: el reproductor continúa leyendo el catálogo local y la vista previa integral por rol, historial, auditoría automática e importación aplicada siguen pendientes.

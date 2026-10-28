@@ -27,7 +27,7 @@ export default function PublicLibraryShell({ theme, onToggleTheme, onLogin, onRe
         <p className="lib-note lib-demo-banner" role="note">Estás explorando sin cuenta. Tu progreso y los temas guardados se almacenan solo en este navegador (modo demo){cloudAvailable ? '; inicia sesión para guardarlo en tu cuenta' : ''}.</p>
         {children}
       </main>
-      <footer className="auth-footer">Garrett Math v10.0.0 · Contenido de demostración, sin revisión docente</footer>
+      <footer className="auth-footer">Garrett Math v11.0.0 · Contenido de demostración, sin revisión docente</footer>
     </div>
   )
 }
