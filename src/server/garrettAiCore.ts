@@ -352,8 +352,22 @@ No inventes títulos, lecciones, ejercicios ni estados editoriales. Solo atribuy
     if (/timeout|deadline|ETIMEDOUT/i.test(detail)) {
       return { ok: false, status: 504, error: 'Gemini tardó demasiado en responder. Inténtalo nuevamente.' }
     }
-    // No se registran cuerpos, prompts, tokens ni claves.
-    console.error('[Garrett AI] Fallo del proveedor Gemini', { status: status || 'unknown' })
+    // Diagnóstico acotado: nunca registrar prompts, historial, cabeceras ni claves.
+    const providerMessage = safeText(error?.message, 500)
+      .replace(/AIza[0-9A-Za-z_-]{20,}/g, '[clave omitida]')
+      .replace(/Bearer\\s+\\S+/gi, 'Bearer [token omitido]')
+      .replace(/([?&](?:key|token|access_token|api_key)=)[^&\\s]+/gi, '$1[omitido]')
+      .replace(/https?:\\/\\/[^\\s]+/gi, '[url omitida]')
+      .slice(0, 300)
+    console.error('[Garrett AI] Fallo del proveedor Gemini', {
+      status: status || 'unknown',
+      code: safeText(error?.code, 80) || 'unknown',
+      name: safeText(error?.name, 80) || 'Error',
+      message: providerMessage || 'Sin mensaje del proveedor',
+    })
+    if (status === 503 || /UNAVAILABLE|overloaded|temporarily unavailable/i.test(detail)) {
+      return { ok: false, status: 503, error: 'Gemini no está disponible en este momento. Inténtalo nuevamente en unos minutos.' }
+    }
     return { ok: false, status: 502, error: 'Garrett AI no pudo procesar la consulta. Inténtalo de nuevo más tarde.' }
   }
 }
