@@ -407,9 +407,9 @@ No inventes títulos, lecciones, ejercicios ni estados editoriales. Solo atribuy
     // Diagnóstico acotado: nunca registrar prompts, historial, cabeceras ni claves.
     const providerMessage = safeText(error?.message, 500)
       .replace(/AIza[0-9A-Za-z_-]{20,}/g, '[clave omitida]')
-      .replace(/Bearer\\s+\\S+/gi, 'Bearer [token omitido]')
-      .replace(/([?&](?:key|token|access_token|api_key)=)[^&\\s]+/gi, '$1[omitido]')
-      .replace(/https?:\\/\\/[^\\s]+/gi, '[url omitida]')
+      .replace(/Bearer\s+\S+/gi, 'Bearer [token omitido]')
+      .replace(/([?&](?:key|token|access_token|api_key)=)[^&\s]+/gi, '$1[omitido]')
+      .replace(/https?:\/\/[^\s]+/gi, '[url omitida]')
       .slice(0, 300)
     console.error('[Garrett AI] Fallo del proveedor Gemini', {
       status: status || 'unknown',
