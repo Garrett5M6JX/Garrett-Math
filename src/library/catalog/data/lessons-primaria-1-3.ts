@@ -1,4 +1,4 @@
-import { ch, ex, fr, lesson, nm, od, sec } from '../helpers'
+import { ch, ex, fr, lesson, nm, od, sec } from '../helpers.js'
 import type { Lesson } from '../../types'
 
 /** Lecciones de 1.º a 3.º de Primaria. Todas son BORRADOR: no han sido revisadas por docentes. */
