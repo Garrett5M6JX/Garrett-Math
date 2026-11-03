@@ -1,4 +1,4 @@
-import { ch, ex, lesson, nm, od, sec } from '../helpers'
+import { ch, ex, lesson, nm, od, sec } from '../helpers.js'
 import type { Lesson } from '../../types'
 
 /** Lecciones de Preescolar. Todas son BORRADOR: no han sido revisadas por docentes. */
