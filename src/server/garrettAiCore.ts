@@ -1,6 +1,6 @@
 import { GoogleGenAI } from '@google/genai'
 import { createClient } from '@supabase/supabase-js'
-import { rawCatalog } from '../library/catalog/data'
+import { rawCatalog } from '../library/catalog/data/index.js'
 
 export type EducationalStage = 'Preescolar' | 'Primaria' | 'Secundaria' | 'Universidad'
 
