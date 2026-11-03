@@ -317,7 +317,7 @@ export async function handleGarrettAiCore(
     hintLevel: Number.isInteger(context?.hintLevel) ? Math.min(3, Math.max(1, Number(context?.hintLevel))) : 1,
   }
 
-  const timeoutMs = Math.min(50000, Math.max(5000, Number(process.env.GARRETT_AI_TIMEOUT_MS || 45000)))
+  const timeoutMs = Math.min(18000, Math.max(5000, Number(process.env.GARRETT_AI_TIMEOUT_MS || 15000)))
   const ai = new GoogleGenAI({ apiKey, httpOptions: { timeout: timeoutMs } })
   const systemInstruction = `${buildSystemInstruction(verifiedStage, verifiedYear, verifiedContext)}
 
@@ -368,7 +368,7 @@ No inventes títulos, lecciones, ejercicios ni estados editoriales. Solo atribuy
     let response
     let usedFallback = false
     try {
-      response = await requestWithRetries(model, 2)
+      response = await requestWithRetries(model, 1)
     } catch (primaryError: any) {
       if (!isOverload(primaryError)) throw primaryError
       const fallbackModel = safeText(process.env.GEMINI_FALLBACK_MODEL, 80) || 'gemini-3.6-flash'
