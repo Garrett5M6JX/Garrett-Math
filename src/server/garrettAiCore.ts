@@ -256,7 +256,7 @@ export async function handleGarrettAiCore(
     .select('education_stage, education_year')
     .eq('id', user.id)
     .maybeSingle()
-  if (profileError) {
+  if (profileError || !profile) {
     return { ok: false, status: 503, error: 'No se pudo verificar tu perfil educativo. Inténtalo más tarde.' }
   }
 
