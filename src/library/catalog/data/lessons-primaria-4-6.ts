@@ -1,5 +1,5 @@
 import { ch, ex, fr, lesson, nm, sec } from '../helpers.js'
-import type { Lesson } from '../../types'
+import type { Lesson } from '../../types.js'
 
 /** Lecciones de 4.º a 6.º de Primaria. Todas son BORRADOR: no han sido revisadas por docentes. */
 export const primaria4a6Lessons: Lesson[] = [
