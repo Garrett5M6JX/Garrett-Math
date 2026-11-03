@@ -51,7 +51,7 @@ function formatLatex(source: string): string {
   let value = source.trim()
   const symbols: Record<string, string> = {
     '\\times': '×', '\\cdot': '·', '\\div': '÷', '\\pm': '±',
-    '\\neq': '≠', '\\leq': '≤', '\\le': '≤', '\\geq': '≥', '\\ge': '≥',
+    '\\neq': '≠', '\\leq': '≤', '\\geq': '≥', '\\le': '≤', '\\ge': '≥',
     '\\approx': '≈', '\\infty': '∞', '\\pi': 'π', '\\theta': 'θ',
     '\\alpha': 'α', '\\beta': 'β', '\\sum': '∑', '\\int': '∫',
     '\\rightarrow': '→', '\\to': '→', '\\Rightarrow': '⇒',
