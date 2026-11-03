@@ -317,10 +317,9 @@ export async function handleGarrettAiCore(
     hintLevel: Number.isInteger(context?.hintLevel) ? Math.min(3, Math.max(1, Number(context?.hintLevel))) : 1,
   }
 
-  try {
-    const timeoutMs = Math.min(50000, Math.max(5000, Number(process.env.GARRETT_AI_TIMEOUT_MS || 45000)))
-    const ai = new GoogleGenAI({ apiKey, httpOptions: { timeout: timeoutMs } })
-    const systemInstruction = `${buildSystemInstruction(verifiedStage, verifiedYear, verifiedContext)}
+  const timeoutMs = Math.min(50000, Math.max(5000, Number(process.env.GARRETT_AI_TIMEOUT_MS || 45000)))
+  const ai = new GoogleGenAI({ apiKey, httpOptions: { timeout: timeoutMs } })
+  const systemInstruction = `${buildSystemInstruction(verifiedStage, verifiedYear, verifiedContext)}
 
 === ROL VERIFICADO ===
 ${role}. Adapta las actividades al rol: estudiantes reciben tutoría; docentes pueden preparar materiales editables; familia recibe explicaciones de apoyo.
@@ -329,20 +328,73 @@ ${role}. Adapta las actividades al rol: estudiantes reciben tutoría; docentes p
 ${libraryContext}
 
 No inventes títulos, lecciones, ejercicios ni estados editoriales. Solo atribuye a la Biblioteca las lecciones listadas en el contexto y respeta su estado editorial: las marcadas como borrador no están aprobadas por docentes. Si el tema figura en preparación o no tiene lección asociada, dilo con claridad. Si el usuario pide explícitamente la solución completa, puedes mostrarla con procedimiento.`
-    const response = await ai.models.generateContent({
-      model,
-      contents: [
-        ...safeHistory.map((item) => ({ role: item.role, parts: [{ text: item.text }] })),
-        { role: 'user', parts: [{ text: message }] },
-      ],
-      config: { systemInstruction, maxOutputTokens: 1200 },
-    })
+  const contents = [
+    ...safeHistory.map((item) => ({ role: item.role, parts: [{ text: item.text }] })),
+    { role: 'user' as const, parts: [{ text: message }] },
+  ]
+  const generate = (selectedModel: string) => ai.models.generateContent({
+    model: selectedModel,
+    contents,
+    config: { systemInstruction, maxOutputTokens: 1200 },
+  })
+  const getStatus = (error: any) => Number(error?.status || error?.code || 0)
+  const getDetail = (error: any) => `${error?.message || ''} ${error?.statusText || ''}`
+  const isOverload = (error: any) => {
+    const detail = getDetail(error)
+    return getStatus(error) === 503 || /UNAVAILABLE|overloaded|high demand|temporarily unavailable/i.test(detail)
+  }
+  const isTemporary = (error: any) => {
+    const status = getStatus(error)
+    return status === 408 || status === 429 || status >= 500 || /UNAVAILABLE|overloaded|high demand|temporarily unavailable/i.test(getDetail(error))
+  }
+  const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+  const requestWithRetries = async (selectedModel: string, retries: number) => {
+    let lastError: any
+    for (let attempt = 0; attempt <= retries; attempt += 1) {
+      try {
+        return await generate(selectedModel)
+      } catch (error: any) {
+        lastError = error
+        if (!isTemporary(error) || attempt === retries) break
+        // Backoff exponencial con jitter para evitar que todos los clientes reintenten juntos.
+        const delayMs = Math.min(4000, 800 * (2 ** attempt)) + Math.floor(Math.random() * 350)
+        await wait(delayMs)
+      }
+    }
+    throw lastError
+  }
+
+  try {
+    let response
+    let usedFallback = false
+    try {
+      response = await requestWithRetries(model, 2)
+    } catch (primaryError: any) {
+      if (!isOverload(primaryError)) throw primaryError
+      const fallbackModel = safeText(process.env.GEMINI_FALLBACK_MODEL, 80) || 'gemini-3.6-flash'
+      if (fallbackModel === model) throw primaryError
+      console.warn('[Garrett AI] Modelo principal saturado; intentando modelo alternativo.', {
+        primaryModel: model,
+        fallbackModel,
+      })
+      try {
+        response = await requestWithRetries(fallbackModel, 0)
+        usedFallback = true
+      } catch (fallbackError: any) {
+        // No registrar prompts, historial, cabeceras ni claves.
+        console.error('[Garrett AI] También falló el modelo alternativo.', {
+          status: getStatus(fallbackError) || 'unknown',
+          name: safeText(fallbackError?.name, 80) || 'Error',
+        })
+        throw fallbackError
+      }
+    }
     const reply = safeText(response.text, 12000)
     if (!reply) return { ok: false, status: 502, error: 'Gemini no devolvió una explicación. Inténtalo de nuevo.' }
-    return { ok: true, reply, stageUsed: verifiedStage, verifiedUser: true }
+    return { ok: true, reply, stageUsed: verifiedStage, verifiedUser: true, fallback: usedFallback }
   } catch (error: any) {
-    const status = Number(error?.status || error?.code || 0)
-    const detail = `${error?.message || ''} ${error?.statusText || ''}`
+    const status = getStatus(error)
+    const detail = getDetail(error)
     if (status === 429 || /RESOURCE_EXHAUSTED|quota|rate.?limit/i.test(detail)) {
       return { ok: false, status: 429, error: 'Gemini ha alcanzado temporalmente su cuota. Espera antes de volver a intentarlo.' }
     }
@@ -355,9 +407,9 @@ No inventes títulos, lecciones, ejercicios ni estados editoriales. Solo atribuy
     // Diagnóstico acotado: nunca registrar prompts, historial, cabeceras ni claves.
     const providerMessage = safeText(error?.message, 500)
       .replace(/AIza[0-9A-Za-z_-]{20,}/g, '[clave omitida]')
-      .replace(/Bearer\s+\S+/gi, 'Bearer [token omitido]')
-      .replace(/([?&](?:key|token|access_token|api_key)=)[^&\s]+/gi, '$1[omitido]')
-      .replace(/https?:\/\/[^\s]+/gi, '[url omitida]')
+      .replace(/Bearer\\s+\\S+/gi, 'Bearer [token omitido]')
+      .replace(/([?&](?:key|token|access_token|api_key)=)[^&\\s]+/gi, '$1[omitido]')
+      .replace(/https?:\\/\\/[^\\s]+/gi, '[url omitida]')
       .slice(0, 300)
     console.error('[Garrett AI] Fallo del proveedor Gemini', {
       status: status || 'unknown',
@@ -365,8 +417,8 @@ No inventes títulos, lecciones, ejercicios ni estados editoriales. Solo atribuy
       name: safeText(error?.name, 80) || 'Error',
       message: providerMessage || 'Sin mensaje del proveedor',
     })
-    if (status === 503 || /UNAVAILABLE|overloaded|temporarily unavailable/i.test(detail)) {
-      return { ok: false, status: 503, error: 'Gemini no está disponible en este momento. Inténtalo nuevamente en unos minutos.' }
+    if (isOverload(error)) {
+      return { ok: false, status: 503, error: 'Garrett AI está recibiendo muchas consultas en este momento. Ya intentamos recuperarnos automáticamente; espera un momento y vuelve a intentarlo.' }
     }
     return { ok: false, status: 502, error: 'Garrett AI no pudo procesar la consulta. Inténtalo de nuevo más tarde.' }
   }
