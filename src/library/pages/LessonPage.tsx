@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { ArrowLeft, ArrowRight, CircleCheck, Clock3, Info, RotateCcw, Trophy } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Brain, CircleCheck, Clock3, Info, RotateCcw, Trophy } from 'lucide-react'
 import type { Catalog, Exercise } from '../types'
 import type { ProgressApi } from '../../hooks/useProgress'
 import { checkExercise } from '../logic/exercises'
@@ -73,7 +73,31 @@ function LessonPlayer({ catalog, progress, lessonId }: { catalog: Catalog; progr
     <div className="lib-lesson">
       <Breadcrumbs items={[{ label: 'Biblioteca', to: lastLibraryUrl() }, { label: stage?.name ?? 'Etapa', to: stage ? libRoutes.stage(stage.id) : undefined }, { label: grade?.name ?? 'Grado', to: grade ? libRoutes.grade(grade.id) : undefined }, { label: topic.title, to: libRoutes.topic(topic.id) }, { label: lesson.title }]} />
       <header className="lib-lesson-head">
-        <div className="lib-chips"><span className="lib-chip"><Clock3 size={13} aria-hidden="true" />{lesson.minutes} min</span><DifficultyChip level={lesson.difficulty} />{lesson.reviewStatus !== 'revisado' && <DraftBadge />}{completed && <span className="lib-chip lib-status status-completed"><CircleCheck size={13} aria-hidden="true" />Completada</span>}</div>
+        <div className="lib-chips">
+          <span className="lib-chip"><Clock3 size={13} aria-hidden="true" />{lesson.minutes} min</span>
+          <DifficultyChip level={lesson.difficulty} />
+          {lesson.reviewStatus !== 'revisado' && <DraftBadge />}
+          {completed && <span className="lib-chip lib-status status-completed"><CircleCheck size={13} aria-hidden="true" />Completada</span>}
+          <button
+            type="button"
+            className="lib-chip"
+            onClick={() => {
+              sessionStorage.setItem('garrett-ai-pending-context', JSON.stringify({
+                lessonId: lesson.id,
+                lessonTitle: lesson.title,
+                topicTitle: topic.title,
+                objective: lesson.objective,
+                workedExample: `${lesson.workedExample.title}: ${lesson.workedExample.problem} -> ${lesson.workedExample.answer}`,
+                actionType: 'explain_lesson',
+              }))
+              navigateTo('/garrett-ai')
+            }}
+            title="Preguntar a Garrett AI sobre esta lección"
+            style={{ cursor: 'pointer', background: '#eeedff', color: '#5d56dc', borderColor: '#d3cffe', fontWeight: 700 }}
+          >
+            <Brain size={13} aria-hidden="true" /> Garrett AI
+          </button>
+        </div>
         <h1>{lesson.title}</h1>
         <p className="lib-objective"><b>Objetivo:</b> {lesson.objective}</p>
         <div className="lib-stepbar" aria-label="Progreso de la lección">

@@ -8,6 +8,7 @@ export const routes = {
   studentHome: '/estudiante',
   studentCourses: '/estudiante/cursos',
   studentProfile: '/perfil',
+  garrettAi: '/garrett-ai',
   teacherHome: '/profesor',
   familyHome: '/familia',
 } as const

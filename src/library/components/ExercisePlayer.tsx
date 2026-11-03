@@ -1,7 +1,8 @@
 import { useId, useState, type FormEvent } from 'react'
-import { ArrowDown, ArrowUp, Check, Lightbulb, RotateCcw, X } from 'lucide-react'
+import { ArrowDown, ArrowUp, Brain, Check, Lightbulb, RotateCcw, X } from 'lucide-react'
 import type { Exercise } from '../types'
 import { correctAnswerText, shuffleDeterministic, type ExerciseResponse } from '../logic/exercises'
+import { navigateTo } from '../../router/navigation'
 import Visual from './Visual'
 import { ReadAloud } from './ui'
 
@@ -109,6 +110,23 @@ export default function ExercisePlayer({ exercise, number, total, session, onCha
       <div className="lib-ex-actions">
         {!locked && <button type="submit" className="lib-btn lib-btn-primary">Comprobar respuesta</button>}
         {!locked && session.hints < hintsAvailable && <button type="button" className="lib-btn lib-btn-secondary" onClick={() => set({ hints: session.hints + 1 })}><Lightbulb size={16} aria-hidden="true" /> Pista {session.hints + 1} de {hintsAvailable}</button>}
+        <button
+          type="button"
+          className="lib-btn lib-btn-ghost"
+          onClick={() => {
+            sessionStorage.setItem('garrett-ai-pending-context', JSON.stringify({
+              exercisePrompt: exercise.prompt,
+              exerciseType: exercise.type,
+              hintsAvailable: exercise.hints,
+              studentAnswer: session.text || (session.choice !== null ? exercise.type === 'choice' ? exercise.options[session.choice] : '' : ''),
+              actionType: session.status === 'wrong' ? 'diagnose_error' : 'hint',
+            }))
+            navigateTo('/garrett-ai')
+          }}
+          title="Pedir ayuda o pistas guiadas a Garrett AI"
+        >
+          <Brain size={15} aria-hidden="true" /> Garrett AI
+        </button>
         {canReveal && <button type="button" className="lib-btn lib-btn-ghost" onClick={onReveal}>Ver la respuesta</button>}
         {locked && <button type="button" className="lib-btn lib-btn-ghost" onClick={() => onChange({ ...initSession(exercise, false), solvedBefore: session.solvedBefore })}><RotateCcw size={15} aria-hidden="true" /> Practicar de nuevo</button>}
       </div>

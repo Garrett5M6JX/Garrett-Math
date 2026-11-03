@@ -1,0 +1,8 @@
+{
+  "name": "Garrett Math",
+  "description": "Plataforma educativa de matemáticas con tutor inteligente Garrett AI y biblioteca curricular paso a paso.",
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ],
+  "version": "12.0.0"
+}

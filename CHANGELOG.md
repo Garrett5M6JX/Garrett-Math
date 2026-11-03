@@ -73,3 +73,14 @@ Entorno de desarrollo **sin acceso a internet**: no se pudieron instalar las dep
 - Retirado del menú lateral el botón «Etapa», que duplicaba la navegación de la Biblioteca.
 - Añadidos avisos claros sobre funciones parciales y tareas pendientes.
 - Limitaciones conocidas: el reproductor aún usa el catálogo local; la vista previa por rol no tiene aislamiento integral de progreso; importación, historial/versiones y auditoría automática necesitan trabajo adicional.
+
+
+## V12.0.0 — Garrett AI (integración y endurecimiento)
+
+- API serverless Gemini con SDK oficial `@google/genai`, modelo configurable y timeout.
+- Autenticación Supabase obligatoria; etapa educativa recuperada en servidor.
+- Cuotas persistentes PostgreSQL por usuario y métricas administrativas agregadas.
+- Recuperación contextual limitada a dos lecciones y distinción entre borrador y temas en preparación.
+- Panel administrativo con estado, modelo, límites y estadísticas agregadas.
+- Migración aditiva `supabase/garrett_ai_v12.sql` y documentación V12.
+- No se almacenan conversaciones en la base de datos.
