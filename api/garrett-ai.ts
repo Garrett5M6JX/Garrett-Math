@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
-import { handleGarrettAiCore, type GarrettAiRequest } from '../src/server/garrettAiCore'
+import { handleGarrettAiCore, type GarrettAiRequest } from '../src/server/garrettAiCore.js'
 
 interface VercelRequest extends IncomingMessage {
   body: unknown
