@@ -1,4 +1,4 @@
-import type { Area, Grade, Stage, Unit } from '../../types'
+import type { Area, Grade, Stage, Unit } from '../../types.js'
 
 export const stages: Stage[] = [
   { id: 'preescolar', name: 'Preescolar', ageRange: '3–5 años', order: 1, description: 'Descubrir los números, las formas y los patrones jugando, observando y manipulando.' },
