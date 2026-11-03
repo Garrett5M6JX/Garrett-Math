@@ -47,14 +47,102 @@ const STARTER_PROMPTS: Record<Level, string[]> = {
   ],
 }
 
-function renderAiLine(line: string) {
-  const parts = line.split(/(\$\$[\s\S]+?\$\$|\$[^$\n]+\$|\\\[[\s\S]+?\\\]|\\\([^\n]+?\\\))/g)
+function formatLatex(source: string): string {
+  let value = source.trim()
+  const symbols: Record<string, string> = {
+    '\\times': '×', '\\cdot': '·', '\\div': '÷', '\\pm': '±',
+    '\\neq': '≠', '\\leq': '≤', '\\le': '≤', '\\geq': '≥', '\\ge': '≥',
+    '\\approx': '≈', '\\infty': '∞', '\\pi': 'π', '\\theta': 'θ',
+    '\\alpha': 'α', '\\beta': 'β', '\\sum': '∑', '\\int': '∫',
+    '\\rightarrow': '→', '\\to': '→', '\\Rightarrow': '⇒',
+    '\\in': '∈', '\\notin': '∉', '\\emptyset': '∅',
+    '\\degree': '°', '\\angle': '∠', '\\therefore': '∴',
+  }
+  value = value.replace(/\\(?:d?frac)\s*\{([^{}]*)\}\s*\{([^{}]*)\}/g, '($1)/($2)')
+  value = value.replace(/\\sqrt\s*\{([^{}]*)\}/g, '√($1)')
+  value = value.replace(/\\sqrt\s*\[([^\]]+)\]\s*\{([^{}]*)\}/g, '√[$1]($2)')
+  for (const [command, symbol] of Object.entries(symbols)) value = value.replaceAll(command, symbol)
+  value = value
+    .replace(/\\(?:left|right|displaystyle|textstyle|quad|qquad)/g, ' ')
+    .replace(/\\(?:text|mathrm|mathbf|operatorname)\s*\{([^{}]*)\}/g, '$1')
+    .replace(/\\[,;!]/g, ' ')
+    .replace(/[{}]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+  const superscripts: Record<string, string> = {
+    '0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹',
+    '+':'⁺','-':'⁻','=':'⁼','(':'⁽',')':'⁾','n':'ⁿ','i':'ⁱ',
+  }
+  value = value.replace(/\^\{([^{}]+)\}|\^([0-9+\-=()ni])/g, (_match, group: string | undefined, single: string | undefined) =>
+    [...(group ?? single ?? '')].map((char) => superscripts[char] ?? char).join(''),
+  )
+  return value
+}
+
+function renderAiLine(line: string, keyPrefix = 'line') {
+  const tokenPattern = /(\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]|\\\([\s\S]+?\\\)|\$[^$\n]+\$|\*\*[^*]+\*\*|__[^_]+__|(?<!\*)\*[^*\n]+\*(?!\*)|(?<!_)_[^_\n]+_(?!_)|\x60[^\x60]+\x60)/g
+  const parts = line.split(tokenPattern)
   return parts.map((part, index) => {
-    const display = part.startsWith('$$') || part.startsWith('\\[')
-    const isMath = display || (part.startsWith('$') && part.endsWith('$')) || (part.startsWith('\\(') && part.endsWith('\\)'))
-    if (!isMath) return <span key={index}>{part}</span>
-    const content = part.startsWith('$$') ? part.slice(2, -2) : part.startsWith('$') ? part.slice(1, -1) : part.slice(2, -2)
-    return <code key={index} className={display ? 'ai-math-expression ai-math-display' : 'ai-math-expression'} role="math" aria-label={`Expresión matemática: ${content}`}>{content}</code>
+    if (!part) return null
+    const key = keyPrefix + '-' + index
+    const displayMath = (part.startsWith('$$') && part.endsWith('$$')) || (part.startsWith('\\[') && part.endsWith('\\]'))
+    const inlineMath = (part.startsWith('$') && part.endsWith('$')) || (part.startsWith('\\(') && part.endsWith('\\)'))
+    if (displayMath || inlineMath) {
+      const content = part.startsWith('$$') ? part.slice(2, -2) : part.startsWith('$') ? part.slice(1, -1) : part.slice(2, -2)
+      const formatted = formatLatex(content)
+      return <span key={key} className={displayMath ? 'ai-math-expression ai-math-display' : 'ai-math-expression'} role="math" aria-label={'Expresión matemática: ' + formatted}>{formatted}</span>
+    }
+    if ((part.startsWith('**') && part.endsWith('**')) || (part.startsWith('__') && part.endsWith('__'))) {
+      return <strong key={key}>{renderAiLine(part.slice(2, -2), key)}</strong>
+    }
+    if ((part.startsWith('*') && part.endsWith('*')) || (part.startsWith('_') && part.endsWith('_'))) {
+      return <em key={key}>{renderAiLine(part.slice(1, -1), key)}</em>
+    }
+    if (part.charCodeAt(0) === 96 && part.charCodeAt(part.length - 1) === 96) return <code key={key}>{part.slice(1, -1)}</code>
+    return <span key={key}>{part}</span>
+  })
+}
+
+function renderAiMessage(text: string) {
+  const lines = text.replace(/\r\n?/g, '\n').split('\n')
+  const blocks: Array<{ type: 'paragraph' | 'ul' | 'ol' | 'heading'; lines: string[]; level?: number }> = []
+  let paragraph: string[] = []
+  let listType: 'ul' | 'ol' | null = null
+  const flushParagraph = () => {
+    if (paragraph.length) blocks.push({ type: 'paragraph', lines: paragraph })
+    paragraph = []
+  }
+  const flushList = () => { listType = null }
+
+  for (const line of lines) {
+    const trimmed = line.trim()
+    if (!trimmed) { flushParagraph(); flushList(); continue }
+    const heading = trimmed.match(/^(#{1,3})\s+(.+)$/)
+    const bullet = trimmed.match(/^[-*•]\s+(.+)$/)
+    const numbered = trimmed.match(/^\d+[.)]\s+(.+)$/)
+    if (heading) {
+      flushParagraph(); flushList()
+      blocks.push({ type: 'heading', lines: [heading[2]], level: heading[1].length })
+    } else if (bullet || numbered) {
+      flushParagraph()
+      const nextType = bullet ? 'ul' : 'ol'
+      if (listType !== nextType) { flushList(); blocks.push({ type: nextType, lines: [] }); listType = nextType }
+      blocks[blocks.length - 1].lines.push((bullet ?? numbered)![1])
+    } else { flushList(); paragraph.push(trimmed) }
+  }
+  flushParagraph()
+
+  return blocks.map((block, index) => {
+    const content = block.lines.map((line, lineIndex) => (
+      <span key={index + '-' + lineIndex}>
+        {renderAiLine(line, 'block-' + index + '-line-' + lineIndex)}
+        {lineIndex < block.lines.length - 1 && block.type === 'paragraph' ? <br /> : null}
+      </span>
+    ))
+    if (block.type === 'ul') return <ul key={index}>{content.map((item, i) => <li key={i}>{item}</li>)}</ul>
+    if (block.type === 'ol') return <ol key={index}>{content.map((item, i) => <li key={i}>{item}</li>)}</ol>
+    if (block.type === 'heading') return <h3 key={index} className={'ai-response-heading ai-response-heading-' + block.level}>{content}</h3>
+    return <p key={index}>{content}</p>
   })
 }
 
@@ -403,16 +491,7 @@ export default function GarrettAiView({
                 </div>
                 <div className="ai-msg-content">
                   <div className="ai-formatted-text">
-                    {m.text.split('\n\n').map((paragraph, pIdx) => (
-                      <p key={pIdx}>
-                        {paragraph.split('\n').map((line, lIdx) => (
-                          <span key={lIdx}>
-                            {renderAiLine(line)}
-                            {lIdx < paragraph.split('\n').length - 1 && <br />}
-                          </span>
-                        ))}
-                      </p>
-                    ))}
+                    {renderAiMessage(m.text)}
                   </div>
 
                   <div className="ai-msg-meta">
