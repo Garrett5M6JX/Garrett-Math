@@ -276,7 +276,7 @@ export async function handleGarrettAiCore(
     return { ok: false, status: 429, error: 'Has alcanzado el límite temporal de consultas. Espera un minuto e inténtalo de nuevo.' }
   }
 
-  const model = safeText(process.env.GEMINI_MODEL, 80) || 'gemini-3.8-flash'
+  const model = safeText(process.env.GEMINI_MODEL, 80) || 'gemini-3.5-flash-lite'
   const minuteEnv = Number(process.env.GARRETT_AI_MAX_PER_MINUTE || 10)
   const dayEnv = Number(process.env.GARRETT_AI_MAX_PER_DAY || 100)
   const maxPerMinute = Number.isFinite(minuteEnv) ? Math.max(1, Math.min(60, Math.floor(minuteEnv))) : 10
