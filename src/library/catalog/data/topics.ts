@@ -1,4 +1,4 @@
-import { topic, withTopicOrder } from '../helpers'
+import { topic, withTopicOrder } from '../helpers.js'
 
 /**
  * Mapa progresivo de temas. Los que no tienen lecciones asociadas en `lessons-*.ts`
