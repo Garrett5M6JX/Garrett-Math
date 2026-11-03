@@ -1,6 +1,6 @@
 import type {
   ChoiceExercise, Difficulty, Exercise, FractionExercise, Lesson, LessonSection, NumberExercise, OrderExercise, Topic, VisualSpec, WorkedExample,
-} from '../types'
+} from '../types.js'
 
 /** Ayudantes para escribir contenido de forma compacta y tipada. No contienen lógica de presentación. */
 
