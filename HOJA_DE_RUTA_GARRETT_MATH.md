@@ -113,3 +113,15 @@ Incluye navegación por etapas, cuatro lecciones base más una segunda lección 
 - No cargar contenido completo de todas las etapas en la pantalla inicial.
 - Revisar tamaño de bundle, compilación, pruebas y experiencia móvil en cada Pull Request.
 - No marcar una versión como lista hasta que Vercel Preview esté en Ready y se hayan probado los flujos afectados.
+
+
+## v15 · Biblioteca matemática ampliada (contenido añadido)
+Se incorporan cuatro lecciones nuevas para Primaria:
+- 5.º: suma y resta de números decimales.
+- 5.º: volumen de prismas rectangulares.
+- 6.º: multiplicación de fracciones.
+- 6.º: sucesos y probabilidad.
+
+Cada lección incluye objetivo, explicación, ejemplo resuelto, ejercicios de práctica, pistas y retroalimentación. El contenido permanece marcado como borrador hasta su revisión docente. Se reutiliza el motor de catálogo existente y su carga diferida; no se añade una dependencia ni una consulta de red nueva.
+
+Siguientes contenidos propuestos: porcentajes aplicados, divisiones con decimales, perímetro y área de figuras compuestas, ecuaciones sencillas, razones y proporcionalidad, estadística y geometría espacial.
