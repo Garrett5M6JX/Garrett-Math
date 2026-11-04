@@ -61,7 +61,7 @@ function formatLatex(source: string): string {
   value = value.replace(/\\(?:d?frac)\s*\{([^{}]*)\}\s*\{([^{}]*)\}/g, '($1)/($2)')
   value = value.replace(/\\sqrt\s*\{([^{}]*)\}/g, '√($1)')
   value = value.replace(/\\sqrt\s*\[([^\]]+)\]\s*\{([^{}]*)\}/g, '√[$1]($2)')
-  for (const [command, symbol] of Object.entries(symbols)) value = value.replaceAll(command, symbol)
+  for (const [command, symbol] of Object.entries(symbols)) value = value.split(command).join(symbol)
   value = value
     .replace(/\\(?:left|right|displaystyle|textstyle|quad|qquad)/g, ' ')
     .replace(/\\(?:text|mathrm|mathbf|operatorname)\s*\{([^{}]*)\}/g, '$1')
