@@ -69,3 +69,23 @@
 
 ## Alcance real de v7
 Incluye navegación por etapas, cuatro lecciones base más una segunda lección por etapa, ejercicios autocorregibles, modo oscuro, progreso local y planificador docente imprimible. No incluye backend, autenticación, IA ni aulas conectadas.
+
+
+## v14 · Acceso a cuentas (implementación)
+- Pantalla propia para solicitar recuperación de contraseña mediante Supabase Auth.
+- Pantalla para actualizar la contraseña después de abrir el enlace de recuperación.
+- Botón «Continuar con Google» usando OAuth de Supabase.
+- La persistencia de sesión ya está activada en `src/services/supabase.ts` con `persistSession: true` y renovación automática; no se almacenan contraseñas localmente.
+
+### Configuración externa necesaria para Google
+1. En Supabase, abrir Authentication → Providers → Google y habilitar el proveedor.
+2. En Google Cloud Console, crear un OAuth Client ID de tipo Web application.
+3. En Authorized redirect URIs de Google, pegar exactamente el callback URL que muestra Supabase para el proveedor Google.
+4. En Supabase → Authentication → URL Configuration, agregar el dominio de producción y el dominio Preview autorizado.
+5. Guardar Client ID y Client Secret solamente en la configuración del proveedor Google de Supabase. Nunca incluir el Client Secret en variables `VITE_*`, React o Git.
+6. Probar el flujo con una cuenta adulta de prueba y verificar el retorno a Garrett Math.
+
+### Límites conocidos
+- Las cuentas creadas mediante Google reciben el rol predeterminado de estudiante. El rol docente debe seguir asignándose mediante el mecanismo administrativo autorizado; no se permite que el navegador se otorgue permisos docentes.
+- El correo de recuperación debe usar la plantilla de correo de Supabase y el dominio debe estar autorizado en URL Configuration.
+- Las rutas de recuperación dependen de que Supabase detecte el token del enlace en la URL.

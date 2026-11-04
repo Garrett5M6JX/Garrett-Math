@@ -378,3 +378,20 @@ button:focus-visible,input:focus-visible{outline:3px solid #9d8cff;outline-offse
 .teacher-hero h1 span{color:#39c653}
 .teacher-hero>p{color:#c3cbc6}
 .teacher-hero .eyebrow{color:#39c653}
+
+/* v14 — accesos de autenticación externos y recuperación */
+.auth-divider{display:flex;align-items:center;gap:12px;margin:17px 0;color:#9296a9;font-size:11px}
+.auth-divider::before,.auth-divider::after{content:"";height:1px;flex:1;background:#e8e9f0}
+.auth-google{width:100%;min-height:46px;display:flex;align-items:center;justify-content:center;gap:10px;border:1px solid #dfe1e9;border-radius:12px;background:#fff;color:#34384d;font-size:13px;font-weight:700}
+.auth-google:hover{background:#f8f9fc;border-color:#c9cddd}
+.auth-google:disabled{opacity:.6;cursor:wait}
+.auth-google span{font-size:17px;font-weight:800;color:#4285f4}
+.auth-success{display:flex;align-items:flex-start;gap:8px;padding:11px 12px;border-radius:10px;background:#eaf8ef;color:#176b39;font-size:12px;line-height:1.55}
+.auth-success svg{flex-shrink:0;margin-top:1px}
+.theme-dark .auth-card{background:#1d2030;border-color:#34384e;color:#eef0fb}
+.theme-dark .auth-card>p{color:#b0b4c9}
+.theme-dark .auth-form label{color:#e1e4f3}
+.theme-dark .auth-form input{background:#171a28!important;color:#f0f1fa!important;border-color:#41465f!important}
+.theme-dark .auth-google{background:#25293a;color:#f0f1fa;border-color:#454a63}
+.theme-dark .auth-divider::before,.theme-dark .auth-divider::after{background:#41465a}
+.theme-dark .auth-success{background:#193727;color:#a8e7bd}
