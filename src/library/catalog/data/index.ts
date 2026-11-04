@@ -5,9 +5,10 @@ import { topics } from './topics.js'
 import { preescolarLessons } from './lessons-preescolar.js'
 import { primaria1a3Lessons } from './lessons-primaria-1-3.js'
 import { primaria4a6Lessons } from './lessons-primaria-4-6.js'
+import { primaria5a6ExtraLessons } from './lessons-primaria-5-6-extra.js'
 
 /** Catálogo inicial en bruto. Para migrar a una base de datos, basta con servir este mismo objeto desde un repositorio remoto. */
 export const rawCatalog: RawCatalog = {
   stages, grades, areas, units, topics,
-  lessons: withLessonOrder([...preescolarLessons, ...primaria1a3Lessons, ...primaria4a6Lessons]),
+  lessons: withLessonOrder([...preescolarLessons, ...primaria1a3Lessons, ...primaria4a6Lessons, ...primaria5a6ExtraLessons]),
 }
