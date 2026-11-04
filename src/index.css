@@ -421,3 +421,6 @@ button:focus-visible,input:focus-visible{outline:3px solid #9d8cff;outline-offse
 @media (max-width: 650px) {
   .theme-toggle { min-width: 38px; width: 38px; flex: 0 0 38px; }
 }
+
+.auth-success{font-size:12px!important;color:#176b43!important;background:#eaf7ef;padding:10px 12px;border-radius:9px;margin:0!important;line-height:1.5}
+.auth-link:disabled{opacity:.6;cursor:wait}
