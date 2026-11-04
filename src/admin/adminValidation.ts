@@ -20,6 +20,8 @@ export function validateLessonContent(value: unknown, base: RawCatalog, id: stri
  if (errors.length) return { valid:false, errors }
  const candidate={...data,id,topicId,title,order} as unknown as Lesson
  const catalog:RawCatalog={...base,lessons:[...base.lessons.filter(item=>item.id!==id),candidate]}
- const catalogErrors=validateCatalog(catalog).filter(message=>message.includes('Lección')||message.includes('Ejercicio')||message.includes('prerrequisito de lecciones'))
+ let catalogErrors:string[]=[]
+ try { catalogErrors=validateCatalog(catalog).filter(message=>message.includes('Lección')||message.includes('Ejercicio')||message.includes('prerrequisito de lecciones')) }
+ catch { catalogErrors=['La estructura interna está incompleta: revisa secciones, ejemplo resuelto y ejercicios.'] }
  return {valid:catalogErrors.length===0,errors:catalogErrors}
 }
