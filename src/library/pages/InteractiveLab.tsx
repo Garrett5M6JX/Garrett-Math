@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, CheckCircle2, GripVertical, RotateCcw, Sparkles } from 'lucide-react'
+import MultiplicationLab from '../components/MultiplicationLab'
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, GripVertical, RotateCcw, Sparkles } from 'lucide-react'
 import { navigateTo } from '../../router/navigation'
 import { libRoutes } from '../routes'
 
@@ -105,10 +106,10 @@ export default function InteractiveLab() {
       <span className="lib-kicker"><Sparkles size={14}/> APRENDE EXPERIMENTANDO</span>
       <h1>Laboratorio matemático</h1>
       <p>Prueba, mueve, construye y descubre. Aquí puedes aprender matemáticas jugando con ideas y objetos interactivos.</p>
-      <div className="lab-hero-stats"><span>4 actividades</span><span>Sin límite de intentos</span><span>Para practicar a tu ritmo</span></div>
+      <div className="lab-hero-stats"><span>5 actividades</span><span>Sin límite de intentos</span><span>Para practicar a tu ritmo</span></div>
     </header>
     <div className="lab-grid">
-      <NumberLineLab/><FractionLab/><GeometryLab/><OrderLab/>
+      <NumberLineLab/><FractionLab/><GeometryLab/><OrderLab/><MultiplicationLab/>
     </div>
     <aside className="lab-next-step"><div><strong>¿Quieres seguir aprendiendo?</strong><p>Explora las lecciones y ejercicios guiados de la biblioteca.</p></div><button type="button" className="lib-btn lib-btn-primary" onClick={()=>navigateTo(libRoutes.home)}>Ver lecciones <ArrowRight size={16}/></button></aside>
   </div>
