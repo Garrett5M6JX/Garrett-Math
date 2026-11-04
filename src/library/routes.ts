@@ -1,6 +1,6 @@
 /** Rutas estables de la Biblioteca. Los identificadores son slugs del catálogo. */
 export const libRoutes = {
-  home: '/biblioteca',
+  home: '/biblioteca',\n  lab: '/biblioteca/laboratorio',
   myLearning: '/mi-aprendizaje',
   stage: (id: string) => `/biblioteca/etapa/${encodeURIComponent(id)}`,
   grade: (id: string) => `/biblioteca/grado/${encodeURIComponent(id)}`,
@@ -9,7 +9,7 @@ export const libRoutes = {
 } as const
 
 export type LibraryRoute =
-  | { name: 'home' } | { name: 'my-learning' }
+  | { name: 'home' } | { name: 'my-learning' } | { name: 'lab' }
   | { name: 'stage' | 'grade' | 'topic' | 'lesson'; id: string }
   | { name: 'not-found' }
 
@@ -19,7 +19,7 @@ export function isLibraryPath(pathname: string): boolean {
 export function parseLibraryPath(pathname: string): LibraryRoute {
   const clean = pathname.replace(/\/+$/, '') || '/'
   if (clean === libRoutes.myLearning) return { name: 'my-learning' }
-  if (clean === libRoutes.home) return { name: 'home' }
+  if (clean === libRoutes.home) return { name: 'home' }\n  if (clean === libRoutes.lab) return { name: 'lab' }
   const match = /^\/biblioteca\/(etapa|grado|tema|leccion)\/([^/]+)$/.exec(clean)
   if (!match) return { name: 'not-found' }
   let id: string
