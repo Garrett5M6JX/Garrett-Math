@@ -52,6 +52,9 @@ declare t text;
 begin
  foreach t in array array['gm_stages','gm_grades','gm_areas','gm_units','gm_topics','gm_lessons'] loop
   execute format('drop policy if exists %I on public.%I',t||'_gm_v11_admin_write',t);
+  execute format('drop policy if exists %I on public.%I',t||'_gm_v11_read_published',t);
+  execute format('drop policy if exists %I on public.%I',t||'_gm_v19_read_published',t);
+  execute format('create policy %I on public.%I for select to anon, authenticated using (status = ''publicado'' or (select public.has_admin_permission(''content.manage'')))',t||'_gm_v19_read_published',t);
   execute format('drop policy if exists %I on public.%I',t||'_gm_v19_content_manage',t);
   execute format('create policy %I on public.%I for all to authenticated using ((select public.has_admin_permission(''content.manage''))) with check ((select public.has_admin_permission(''content.manage'')))',t||'_gm_v19_content_manage',t);
  end loop;
@@ -108,3 +111,10 @@ create policy gm_v19_audit_superadmin_read on public.audit_log for select to aut
  using (exists(select 1 from public.admin_users au where au.user_id=(select auth.uid())));
 create policy gm_v19_audit_superadmin_insert on public.audit_log for insert to authenticated
  with check (exists(select 1 from public.admin_users au where au.user_id=(select auth.uid())) and actor_id=(select auth.uid()));
+
+-- Las versiones de lecciones también se reservan a quienes pueden gestionar contenido.
+drop policy if exists gm_v11_versions_admin_only on public.gm_lesson_versions;
+drop policy if exists gm_v19_versions_content_manage on public.gm_lesson_versions;
+create policy gm_v19_versions_content_manage on public.gm_lesson_versions for all to authenticated
+ using ((select public.has_admin_permission('content.manage')))
+ with check ((select public.has_admin_permission('content.manage')));
