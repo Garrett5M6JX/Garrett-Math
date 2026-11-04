@@ -663,3 +663,44 @@
   text-align: center;
   overflow-x: auto;
 }
+
+
+/* Markdown y notación matemática interpretada en las respuestas de Garrett AI */
+.ai-formatted-text strong { font-weight: 750; color: inherit; }
+.ai-formatted-text em { font-style: italic; }
+.ai-formatted-text .ai-response-heading {
+  margin: 12px 0 7px;
+  color: #343957;
+  font-weight: 800;
+  line-height: 1.35;
+}
+.ai-formatted-text .ai-response-heading-1 { font-size: 1.18em; }
+.ai-formatted-text .ai-response-heading-2 { font-size: 1.1em; }
+.ai-formatted-text .ai-response-heading-3 { font-size: 1.04em; }
+.ai-formatted-text ul, .ai-formatted-text ol { padding-left: 22px; }
+.ai-formatted-text li { padding-left: 3px; }
+.ai-formatted-text .ai-math-expression {
+  color: #39418b;
+  font-weight: 600;
+  font-family: "Cambria Math", "STIX Two Math", "Times New Roman", serif;
+  letter-spacing: .01em;
+}
+.ai-formatted-text .ai-math-display {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin: 9px auto;
+  padding: 7px 14px;
+  border: 1px solid rgba(93, 86, 220, .16);
+  border-radius: 9px;
+  background: rgba(93, 86, 220, .06);
+  text-align: center;
+  font-size: 1.22em;
+  overflow-wrap: anywhere;
+}
+.theme-dark .ai-formatted-text .ai-response-heading { color: #e5e7f8; }
+.theme-dark .ai-formatted-text .ai-math-expression { color: #d6d2ff; }
+.theme-dark .ai-formatted-text .ai-math-display {
+  border-color: rgba(160, 151, 255, .24);
+  background: rgba(112, 103, 220, .12);
+}
