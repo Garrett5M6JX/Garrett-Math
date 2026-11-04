@@ -107,3 +107,14 @@
 .admin-external-link{display:inline-flex;align-items:center;gap:7px;color:#26734d;font-size:13px;font-weight:650;text-decoration:none}
 .admin-external-link:hover{text-decoration:underline}
 @media(max-width:650px){.admin-graph-columns{grid-template-columns:1fr}.admin-ai-env{grid-template-columns:1fr;gap:5px}.admin-ai-env span{margin-bottom:8px}.admin-graph-lessons>div{flex-direction:column}}
+
+/* V28–V29 — configuración global y automatizaciones */
+.admin-global-settings{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;padding:18px;border:1px solid var(--admin-border);border-radius:12px;background:var(--admin-surface)}
+.admin-global-settings label{display:flex;flex-direction:column;gap:7px;font-size:13px;font-weight:650}
+.admin-global-settings input,.admin-global-settings textarea,.admin-global-settings select{width:100%;min-width:0;padding:10px 11px;border:1px solid var(--admin-border);border-radius:8px;background:var(--admin-bg);color:var(--admin-text);font:inherit}
+.admin-global-settings small{font-size:11px;font-weight:400;color:var(--admin-muted)}
+.admin-global-settings label:nth-child(2){grid-column:1/-1}
+.admin-alert.success{padding:11px 13px;border-radius:9px;background:#eaf7ef;color:#176b43;font-size:13px}
+.admin-editor .admin-form-grid{margin-bottom:12px}
+.admin-icon-button.danger{color:#b42318}
+@media(max-width:650px){.admin-global-settings{grid-template-columns:1fr}.admin-global-settings label:nth-child(2){grid-column:auto}}
