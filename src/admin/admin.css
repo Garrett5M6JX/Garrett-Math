@@ -118,3 +118,15 @@
 .admin-editor .admin-form-grid{margin-bottom:12px}
 .admin-icon-button.danger{color:#b42318}
 @media(max-width:650px){.admin-global-settings{grid-template-columns:1fr}.admin-global-settings label:nth-child(2){grid-column:auto}}
+
+/* V32 — historial recuperable de lecciones */
+.admin-history{display:grid;gap:12px;margin-top:18px;padding:16px;border:1px solid var(--admin-border);border-radius:11px;background:#fbfdfb}
+.admin-history .admin-toolbar{align-items:center}
+.admin-history h4{display:flex;align-items:center;gap:7px;margin:0 0 5px;font-size:14px;color:#205d40}
+.admin-history .admin-toolbar p{margin:0;font-size:12px;color:var(--admin-muted)}
+.admin-history-list{display:grid;gap:8px}
+.admin-history-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 12px;border:1px solid var(--admin-border);border-radius:9px;background:#fff}
+.admin-history-item>div{display:grid;gap:3px}
+.admin-history-item strong{font-size:13px}
+.admin-history-item small{font-size:11px;color:var(--admin-muted)}
+@media(max-width:560px){.admin-history-item{align-items:flex-start;flex-direction:column}.admin-history-item .admin-button{width:100%}}
