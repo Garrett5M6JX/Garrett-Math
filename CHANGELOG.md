@@ -84,3 +84,11 @@ Entorno de desarrollo **sin acceso a internet**: no se pudieron instalar las dep
 - Panel administrativo con estado, modelo, límites y estadísticas agregadas.
 - Migración aditiva `supabase/garrett_ai_v12.sql` y documentación V12.
 - No se almacenan conversaciones en la base de datos.
+
+
+## v13.0.0 — Base visual y experiencia docente
+- Se estabilizan las dimensiones del selector de tema para evitar saltos entre modo claro y oscuro.
+- Se mejora la legibilidad del espacio docente en modo oscuro, conservando la identidad Kelly green.
+- Se amplía la hoja de ruta con las siguientes etapas de autenticación, biblioteca, interactividad y herramientas docentes.
+- No se cambian los datos de Supabase, el proveedor Gemini ni el esquema de autenticación.
+- La persistencia de sesión de Supabase ya está activada mediante `persistSession: true`; no se añade almacenamiento inseguro de contraseñas.
