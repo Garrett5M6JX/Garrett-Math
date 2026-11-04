@@ -84,3 +84,12 @@ Entorno de desarrollo **sin acceso a internet**: no se pudieron instalar las dep
 - Panel administrativo con estado, modelo, límites y estadísticas agregadas.
 - Migración aditiva `supabase/garrett_ai_v12.sql` y documentación V12.
 - No se almacenan conversaciones en la base de datos.
+
+
+## v14.0.0 — Recuperación de cuenta y acceso con Google
+- Añadida pantalla para solicitar correo de recuperación mediante Supabase Auth.
+- Añadida pantalla para establecer una nueva contraseña con el enlace seguro de recuperación.
+- Añadido botón de OAuth Google en el inicio de sesión.
+- La sesión persistente existente se conserva (`persistSession: true` y `autoRefreshToken: true`).
+- La activación de Google requiere configurar credenciales OAuth y URLs autorizadas en Supabase/Google Cloud; el código no contiene secretos.
+- Sin migraciones de base de datos.
