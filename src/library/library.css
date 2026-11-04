@@ -238,3 +238,6 @@
 @media(max-width:760px){.lab-grid{grid-template-columns:1fr}.lab-next-step,.lib-lab-promo{align-items:flex-start;flex-direction:column}.lab-next-step .lib-btn,.lib-lab-promo .lib-btn{width:100%}}
 @media(max-width:420px){.lab-control-row{grid-template-columns:1fr}.lab-shape-stage{align-items:flex-start}.lab-shape-svg{width:42%}.lab-card{padding:15px}}
 @media(prefers-reduced-motion:reduce){.lab-fraction-visual span{transition:none}}
+
+.lab-page .lib-answer-input{width:100%;min-height:48px;padding:10px 12px;border:1.5px solid var(--l-border);border-radius:12px;background:var(--l-card);color:var(--l-text);font:600 1rem 'DM Sans',sans-serif}
+.lab-page .lib-answer-input:focus{outline:3px solid var(--l-focus);outline-offset:2px}
