@@ -46,7 +46,7 @@ as $$
  where gm.user_id=(select auth.uid()) and gp.permission=p_permission)
 $$;
 revoke all on function public.has_admin_permission(text) from public;
-grant execute on function public.has_admin_permission(text) to authenticated;
+grant execute on function public.has_admin_permission(text) to anon, authenticated;
 do $$
 declare t text;
 begin
