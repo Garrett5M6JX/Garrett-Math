@@ -378,3 +378,46 @@ button:focus-visible,input:focus-visible{outline:3px solid #9d8cff;outline-offse
 .teacher-hero h1 span{color:#39c653}
 .teacher-hero>p{color:#c3cbc6}
 .teacher-hero .eyebrow{color:#39c653}
+
+/* v13 — controles estables entre temas y contraste docente */
+.theme-toggle {
+  min-width: 132px;
+  min-height: 40px;
+  flex: 0 0 132px;
+  white-space: nowrap;
+  justify-content: center;
+}
+.theme-toggle span { line-height: 1; }
+.theme-dark .teacher-mode .teacher-hero {
+  background: linear-gradient(135deg, #17251a, #1d2b20);
+  border-color: #35513a;
+}
+.theme-dark .teacher-mode .teacher-hero h1 { color: #f0f7ee; }
+.theme-dark .teacher-mode .teacher-hero > p { color: #c0d0bf; }
+.theme-dark .teacher-mode .teacher-stat-grid > article,
+.theme-dark .teacher-mode .teacher-builder,
+.theme-dark .teacher-mode .teacher-resource-card,
+.theme-dark .teacher-mode .teacher-roadmap-note {
+  background: #1d2920;
+  border-color: #344a37;
+  color: #e8f2e5;
+}
+.theme-dark .teacher-mode .teacher-section-heading h2,
+.theme-dark .teacher-mode .teacher-resource-card strong { color: #eef7eb; }
+.theme-dark .teacher-mode .teacher-section-heading p,
+.theme-dark .teacher-mode .teacher-resource-card p { color: #b6c8b3; }
+.theme-dark .teacher-mode .teacher-form-grid label { color: #d7e5d3; }
+.theme-dark .teacher-mode .teacher-form-grid input,
+.theme-dark .teacher-mode .teacher-form-grid select {
+  background: #17221a;
+  color: #f0f7ee;
+  border-color: #48634b;
+}
+.theme-dark .teacher-mode .worksheet-preview {
+  background: #18241b;
+  border-color: #3a563d;
+  color: #edf6ea;
+}
+@media (max-width: 650px) {
+  .theme-toggle { min-width: 38px; width: 38px; flex: 0 0 38px; }
+}

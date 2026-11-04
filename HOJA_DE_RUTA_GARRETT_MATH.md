@@ -69,3 +69,59 @@
 
 ## Alcance real de v7
 Incluye navegación por etapas, cuatro lecciones base más una segunda lección por etapa, ejercicios autocorregibles, modo oscuro, progreso local y planificador docente imprimible. No incluye backend, autenticación, IA ni aulas conectadas.
+
+
+## v13–v18 — Evolución incremental (plan de trabajo)
+### v13 · Calidad visual y accesibilidad
+- Mantener dimensiones constantes del selector de tema entre modo claro y oscuro.
+- Mejorar contraste del espacio docente en modo oscuro.
+- Verificar navegación con teclado, estados de foco y reducción de movimiento.
+- Mantener componentes ligeros y evitar dependencias innecesarias.
+
+### v14 · Cuentas y acceso
+- Recuperación de contraseña con Supabase Auth y flujo seguro de actualización.
+- Inicio de sesión con Google OAuth configurado desde Supabase.
+- Mensajes claros para enlaces caducados, correo no confirmado y errores de autenticación.
+- Mantener la sesión persistente (ya activada en el cliente Supabase) y explicar cómo cerrar sesión en dispositivos compartidos.
+- No almacenar contraseñas ni secretos OAuth en el navegador.
+
+### v15 · Biblioteca ampliada
+- Incorporar lecciones nuevas por grado, con objetivos, prerrequisitos, explicación, ejemplo y ejercicios.
+- Publicar contenido solo después de validar respuestas y soluciones.
+- Mantener el catálogo separado de la interfaz y cargar módulos de contenido por demanda cuando el volumen crezca.
+
+### v16 · Experiencias interactivas
+- Añadir actividades de arrastrar y soltar accesibles también con teclado.
+- Incorporar rectas numéricas, modelos de fracciones y geometría manipulable.
+- Guardar intentos y retroalimentación sin duplicar consultas al servidor.
+
+### v17 · Espacio docente
+- Guardar borradores de guías y prácticas.
+- Planificador de clase con objetivos, duración, materiales y secuencia.
+- Banco filtrable de ejercicios y exportación/impresión.
+- Mantener recursos personales privados hasta contar con políticas RLS revisadas.
+
+### v18 · Aulas y seguimiento
+- Aulas, códigos de invitación, tareas y fechas de entrega.
+- Informes de progreso y resultados por estudiante.
+- Requiere diseño de tablas, permisos por rol, RLS y pruebas antes de activar datos reales.
+
+## Reglas de rendimiento para cada versión
+- Preferir React/CSS y componentes existentes antes de instalar dependencias.
+- Evitar peticiones repetidas; paginar listas grandes y usar consultas selectivas.
+- Dividir rutas y módulos pesados mediante carga diferida cuando proceda.
+- No cargar contenido completo de todas las etapas en la pantalla inicial.
+- Revisar tamaño de bundle, compilación, pruebas y experiencia móvil en cada Pull Request.
+- No marcar una versión como lista hasta que Vercel Preview esté en Ready y se hayan probado los flujos afectados.
+
+
+## v15 · Biblioteca matemática ampliada (contenido añadido)
+Se incorporan cuatro lecciones nuevas para Primaria:
+- 5.º: suma y resta de números decimales.
+- 5.º: volumen de prismas rectangulares.
+- 6.º: multiplicación de fracciones.
+- 6.º: sucesos y probabilidad.
+
+Cada lección incluye objetivo, explicación, ejemplo resuelto, ejercicios de práctica, pistas y retroalimentación. El contenido permanece marcado como borrador hasta su revisión docente. Se reutiliza el motor de catálogo existente y su carga diferida; no se añade una dependencia ni una consulta de red nueva.
+
+Siguientes contenidos propuestos: porcentajes aplicados, divisiones con decimales, perímetro y área de figuras compuestas, ecuaciones sencillas, razones y proporcionalidad, estadística y geometría espacial.
