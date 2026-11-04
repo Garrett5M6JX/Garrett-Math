@@ -98,3 +98,13 @@ $$;
 revoke all on function public.gm_admin_set_member_role(text,text) from public;
 grant execute on function public.gm_admin_set_member_role(text,text) to authenticated;
 -- Las membresías no se pueden leer ni modificar directamente desde el cliente.
+
+-- El registro de auditoría y la administración de roles quedan reservados al superadministrador.
+drop policy if exists gm_v11_audit_admin_read on public.audit_log;
+drop policy if exists gm_v11_audit_admin_insert on public.audit_log;
+drop policy if exists gm_v19_audit_superadmin_read on public.audit_log;
+drop policy if exists gm_v19_audit_superadmin_insert on public.audit_log;
+create policy gm_v19_audit_superadmin_read on public.audit_log for select to authenticated
+ using (exists(select 1 from public.admin_users au where au.user_id=(select auth.uid())));
+create policy gm_v19_audit_superadmin_insert on public.audit_log for insert to authenticated
+ with check (exists(select 1 from public.admin_users au where au.user_id=(select auth.uid())) and actor_id=(select auth.uid()));
