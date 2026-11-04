@@ -9,6 +9,7 @@ import { GradePage, NotFoundPage, StagePage } from './pages/BrowsePages'
 import TopicPage from './pages/TopicPage'
 import LessonPage from './pages/LessonPage'
 import MyLearning from './pages/MyLearning'
+import InteractiveLab from './pages/InteractiveLab'
 import { ErrorState, LoadingState } from './components/ui'
 import './library.css'
 
@@ -46,7 +47,7 @@ export default function LibraryApp({ progress, favorites, signedIn, preferredGra
       {catalogState.status === 'error' && <ErrorState detail={catalogState.error} onRetry={catalogState.retry} />}
       {catalog && (() => {
         switch (route.name) {
-          case 'home': return <LibraryHome catalog={catalog} progress={progress} favorites={favorites} preferredGradeId={preferredGradeId} />
+          case 'home': return <LibraryHome catalog={catalog} progress={progress} favorites={favorites} preferredGradeId={preferredGradeId} />\n          case 'lab': return <InteractiveLab />
           case 'stage': return <StagePage catalog={catalog} progress={progress} id={route.id} />
           case 'grade': return <GradePage catalog={catalog} progress={progress} id={route.id} />
           case 'topic': return <TopicPage catalog={catalog} progress={progress} favorites={favorites} id={route.id} />

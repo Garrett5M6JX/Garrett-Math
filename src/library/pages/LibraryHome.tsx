@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { ArrowRight, Search, X } from 'lucide-react'
+import { ArrowRight, Search, X, Sparkles } from 'lucide-react'
 import type { Catalog } from '../types'
 import type { ProgressApi } from '../../hooks/useProgress'
 import type { FavoritesApi } from '../../hooks/useFavorites'
@@ -64,6 +64,8 @@ export default function LibraryHome({ catalog, progress, favorites, preferredGra
           </div>
         </form>
       </section>
+
+      {browsing && <section className="lib-lab-promo" aria-label="Laboratorio matemático interactivo"><div><span className="lib-kicker"><Sparkles size={13}/> APRENDE EXPERIMENTANDO</span><h2>¿Listo para jugar con las matemáticas?</h2><p>Manipula fracciones, explora figuras y practica con una recta numérica interactiva.</p></div><button type="button" className="lib-btn lib-btn-primary" onClick={() => navigateTo(libRoutes.lab)}>Abrir laboratorio <ArrowRight size={16}/></button></section>}
 
       {browsing && next && nextTopic && (
         <section className="lib-continue" aria-labelledby="lib-continue-title">
