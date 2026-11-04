@@ -80,3 +80,10 @@
 .admin-advanced-editor{padding:12px;border:1px solid var(--admin-border);border-radius:9px;background:#fff}
 .admin-advanced-editor summary{cursor:pointer;font-size:13px;font-weight:650;color:#4b5560}
 .admin-advanced-editor label{margin-top:12px}
+
+/* V23–V24 — módulos de docentes, aulas e indicadores */
+.admin-analytics-grid{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+.admin-analytics-grid article>svg{width:19px;height:19px;color:var(--admin-accent)}
+.admin-panel h2 svg,.admin-editor h3 svg{vertical-align:middle;margin-right:6px}
+.admin-panel .admin-toolbar h2{display:flex;align-items:center;gap:8px}
+.admin-panel .admin-table code{font-size:12px;letter-spacing:.04em}
