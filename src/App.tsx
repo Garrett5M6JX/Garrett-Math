@@ -96,6 +96,7 @@ function App() {
   const [recoveryNotice, setRecoveryNotice] = useState('')
   const [recoveryPassword, setRecoveryPassword] = useState('')
   const [recoveryBusy, setRecoveryBusy] = useState(false)
+  const [recoverySessionReady, setRecoverySessionReady] = useState(false)
   const [authReady, setAuthReady] = useState(!supabaseConfigured)
   /** Id del usuario autenticado en Supabase (null en modo demo o sin sesión). Los datos solo se sincronizan con una sesión real. */
   const [authUserId, setAuthUserId] = useState<string | null>(null)
@@ -126,8 +127,10 @@ function App() {
       finally { if (alive) setAuthReady(true) }
     }
     void restoreSession()
-    const { data: listener } = supabase!.auth.onAuthStateChange((_event, session) => {
+    const { data: listener } = supabase!.auth.onAuthStateChange((event, session) => {
       setAuthUserId(session?.user?.id ?? null)
+      if (event === 'PASSWORD_RECOVERY' && session?.user) setRecoverySessionReady(true)
+      if (event === 'SIGNED_OUT' || !session) setRecoverySessionReady(false)
       if (!session) { setAccount(null); try { localStorage.removeItem('garrett-math-demo-account') } catch { /* opcional */ } }
     })
     return () => { alive = false; listener.subscription.unsubscribe() }
@@ -337,14 +340,25 @@ function App() {
     if (recoveryPassword.length < 8) { setAuthError('La nueva contraseña debe tener al menos 8 caracteres.'); return }
     setRecoveryBusy(true)
     try {
+      // Supabase solo permite cambiar la clave desde una sesión válida del enlace de recuperación.
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+      if (sessionError) throw sessionError
+      if (!session?.user || !recoverySessionReady) {
+        throw new Error('Supabase no reconoció una sesión de recuperación válida. Solicita un enlace nuevo desde «¿Olvidaste tu contraseña?» y ábrelo en el mismo navegador.')
+      }
       const { error } = await supabase.auth.updateUser({ password: recoveryPassword })
       if (error) throw error
-      setRecoveryNotice('Contraseña actualizada. Ya puedes iniciar sesión con tu nueva contraseña.')
       setRecoveryPassword('')
-      await supabase.auth.signOut()
-      setAccount(null); setAuthUserId(null); navigateAuth('login')
-    } catch (error) { setAuthError(error instanceof Error ? error.message : 'No se pudo actualizar la contraseña. Solicita un enlace nuevo.') }
-    finally { setRecoveryBusy(false) }
+      setRecoverySessionReady(false)
+      // El cambio de contraseña ya se completó; un fallo al cerrar sesión no debe presentarse como fallo del cambio.
+      await supabase.auth.signOut().catch(() => undefined)
+      setAccount(null); setAuthUserId(null)
+      setRecoveryNotice('¡Contraseña actualizada correctamente! Ya puedes iniciar sesión con tu nueva contraseña.')
+      navigateAuth('login')
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'No se pudo actualizar la contraseña.'
+      setAuthError(message)
+    } finally { setRecoveryBusy(false) }
   }
   const signOut = () => { if (supabase) void supabase!.auth.signOut(); setAccount(null); setAuthUserId(null); try { localStorage.removeItem('garrett-math-demo-account') } catch { /* almacenamiento opcional */ }; navigateAuth('welcome'); navigate('/'); setAuthError(''); setSelectedStage(null); setOpenedLesson(null); setProfileOpen(false) }
   useEffect(() => {
@@ -365,7 +379,7 @@ function App() {
 
   if (!authReady) return <div className="auth-shell"><div className="auth-card"><Brand /><p>Verificando tu sesión segura…</p></div></div>
 
-  if (routePath === '/restablecer-contrasena') return <div className="auth-shell"><div className="auth-card"><Brand/><span className="auth-kicker">SEGURIDAD DE LA CUENTA</span><h1>Crear nueva contraseña</h1><p>Escribe una contraseña nueva para tu cuenta de Garrett Math.</p><form className="auth-form" onSubmit={updateRecoveredPassword}><label>Nueva contraseña<input type="password" value={recoveryPassword} onChange={e=>setRecoveryPassword(e.target.value)} autoComplete="new-password" minLength={8} required placeholder="Al menos 8 caracteres"/></label>{authError&&<p className="auth-error" role="alert">{authError}</p>}{recoveryNotice&&<p className="auth-success" role="status">{recoveryNotice}</p>}<button className="auth-primary" type="submit" disabled={recoveryBusy}>{recoveryBusy?'Actualizando…':'Guardar nueva contraseña'} <ChevronRight size={18}/></button></form><button className="auth-link" onClick={()=>navigateAuth('login')}>Volver al inicio de sesión</button></div></div>
+  if (routePath === '/restablecer-contrasena') return <div className="auth-shell"><div className="auth-card"><Brand/><span className="auth-kicker">SEGURIDAD DE LA CUENTA</span><h1>Crear nueva contraseña</h1>{!authReady?<p>Verificando el enlace seguro de recuperación…</p>:!recoverySessionReady?<><p className="auth-error" role="alert">Este enlace no ha iniciado una sesión de recuperación válida o ya expiró.</p><p>Vuelve al inicio de sesión, selecciona «¿Olvidaste tu contraseña?» y solicita un enlace nuevo. Ábrelo en el mismo navegador donde vas a cambiar la contraseña.</p><button className="auth-primary" type="button" onClick={()=>navigateAuth('login')}>Volver al inicio de sesión <ChevronRight size={18}/></button></>:<><p>El enlace fue reconocido. Escribe una contraseña nueva para tu cuenta de Garrett Math.</p><form className="auth-form" onSubmit={updateRecoveredPassword}><label>Nueva contraseña<input type="password" value={recoveryPassword} onChange={e=>setRecoveryPassword(e.target.value)} autoComplete="new-password" minLength={8} required placeholder="Al menos 8 caracteres"/></label>{authError&&<p className="auth-error" role="alert">{authError}</p>}<button className="auth-primary" type="submit" disabled={recoveryBusy}>{recoveryBusy?'Actualizando…':'Guardar nueva contraseña'} <ChevronRight size={18}/></button></form></>}</div></div>
   if (routePath === '/admin') return <AdminApp onExit={() => { if (account) navigate(account.role === 'teacher' ? '/profesor' : account.role === 'parent' ? '/familia' : '/estudiante'); else navigate('/iniciar-sesion') }} onNavigate={navigate} />
 
   if (!account && isLibraryPath(routePath)) return (
