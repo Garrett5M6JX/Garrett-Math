@@ -92,3 +92,10 @@ Entorno de desarrollo **sin acceso a internet**: no se pudieron instalar las dep
 - Se amplía la hoja de ruta con las siguientes etapas de autenticación, biblioteca, interactividad y herramientas docentes.
 - No se cambian los datos de Supabase, el proveedor Gemini ni el esquema de autenticación.
 - La persistencia de sesión de Supabase ya está activada mediante `persistSession: true`; no se añade almacenamiento inseguro de contraseñas.
+
+
+## v15.0.0 — Biblioteca ampliada
+- Añadidas cuatro lecciones de Primaria (5.º y 6.º): operaciones con decimales, volumen de prismas, multiplicación de fracciones y probabilidad.
+- Cada lección incorpora explicación, ejemplo resuelto, tres ejercicios y pistas.
+- Contenido editorial marcado como borrador para revisión de docentes.
+- Reutiliza la carga diferida y el catálogo existente; sin nuevas dependencias ni migraciones de base de datos.
