@@ -87,3 +87,23 @@
 .admin-panel h2 svg,.admin-editor h3 svg{vertical-align:middle;margin-right:6px}
 .admin-panel .admin-toolbar h2{display:flex;align-items:center;gap:8px}
 .admin-panel .admin-table code{font-size:12px;letter-spacing:.04em}
+
+/* V25–V27 — seguridad, centro Garrett AI y mapa curricular */
+.admin-graph-focus{padding:20px;border:1px solid var(--admin-border);border-radius:12px;background:#f7fbf8}
+.admin-graph-focus h3{margin:7px 0;color:#205d40;font-size:20px}
+.admin-graph-focus p{margin:0}
+.admin-graph-kicker{font-size:10px;letter-spacing:.12em;font-weight:800;color:#26734d}
+.admin-graph-meta{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+.admin-graph-meta span{padding:5px 9px;border-radius:20px;background:#eaf4ee;color:#286447;font-size:11px;font-weight:650}
+.admin-graph-columns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:18px 0}
+.admin-graph-columns>div,.admin-graph-lessons{padding:16px;border:1px solid var(--admin-border);border-radius:11px;min-width:0}
+.admin-graph-columns h3,.admin-graph-lessons h3{display:flex;align-items:center;gap:7px;font-size:14px;margin:0 0 12px}
+.admin-graph-node{width:100%;display:flex;justify-content:space-between;align-items:center;gap:10px;text-align:left;padding:11px 12px;margin:6px 0;border:1px solid var(--admin-border);border-radius:8px;background:white;color:var(--admin-text);cursor:pointer}
+.admin-graph-node:hover{border-color:#80b397;background:#f7fbf8}
+.admin-graph-lessons>div{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--admin-border);font-size:13px}
+.admin-graph-lessons>div span{color:var(--admin-muted)}
+.admin-ai-env{display:grid;grid-template-columns:minmax(190px,auto) 1fr;gap:10px 16px;align-items:center;font-size:12px}
+.admin-ai-env code{padding:5px 7px;background:#eef2ef;border-radius:6px;overflow-wrap:anywhere}
+.admin-external-link{display:inline-flex;align-items:center;gap:7px;color:#26734d;font-size:13px;font-weight:650;text-decoration:none}
+.admin-external-link:hover{text-decoration:underline}
+@media(max-width:650px){.admin-graph-columns{grid-template-columns:1fr}.admin-ai-env{grid-template-columns:1fr;gap:5px}.admin-ai-env span{margin-bottom:8px}.admin-graph-lessons>div{flex-direction:column}}
