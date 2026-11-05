@@ -432,8 +432,8 @@ function App() {
     <div className={`app-shell ${theme === 'dark' ? 'theme-dark' : ''} ${workspaceMode === 'teacher' ? 'teacher-mode' : ''}`}>
       <aside className={`sidebar ${menuOpen ? 'sidebar-open' : ''}`}>
         <div className="brand">
-          <div className="brand-mark"><GraduationCap size={23} strokeWidth={2.4} /></div>
-          <div><strong>Garrett <span>Math</span></strong><small>Aprende a tu ritmo</small></div>
+          <img className="brand-mark-image" src="/althea-mark.svg" alt="" aria-hidden="true" />
+          <div><strong>Althea</strong><small>Aprende a tu ritmo</small></div>
           <button className="mobile-close icon-button" onClick={() => setMenuOpen(false)} aria-label="Cerrar menú"><X size={19} /></button>
         </div>
 
@@ -442,9 +442,9 @@ function App() {
           {account.role === 'student' && <button className={`nav-item ${selectedStage === null && workspaceMode === 'student' && !isLibraryRoute && !profileOpen ? 'active' : ''}`} onClick={() => { setWorkspaceMode('student'); setSelectedStage(null); setProfileOpen(false); setMenuOpen(false); navigate(routes.studentHome) }}><House size={18} />Inicio</button>}
           {account.role === 'teacher' && <button className={`nav-item ${workspaceMode === 'teacher' && !isLibraryRoute && routePath !== routes.garrettAi ? 'active' : ''}`} onClick={() => { setWorkspaceMode('teacher'); setSelectedStage(null); setProfileOpen(false); setMenuOpen(false); navigate(routes.teacherHome) }}><Presentation size={18} />Espacio docente</button>}
           {account.role === 'teacher' && <button className={`nav-item ${routePath === libRoutes.home || routePath.startsWith(`${libRoutes.home}/`) ? 'active' : ''}`} aria-current={isLibraryRoute ? 'page' : undefined} onClick={() => { setProfileOpen(false); setMenuOpen(false); navigateTo(libRoutes.home) }}><BookOpen size={18} />Biblioteca matemática</button>}
-          {account.role === 'teacher' && <button className={`nav-item ${routePath === routes.garrettAi ? 'active' : ''}`} aria-current={routePath === routes.garrettAi ? 'page' : undefined} onClick={() => { setProfileOpen(false); setMenuOpen(false); navigate(routes.garrettAi) }}><Brain size={18} />Garrett AI</button>}
+          {account.role === 'teacher' && <button className={`nav-item ${routePath === routes.garrettAi ? 'active' : ''}`} aria-current={routePath === routes.garrettAi ? 'page' : undefined} onClick={() => { setProfileOpen(false); setMenuOpen(false); navigate(routes.garrettAi) }}><Brain size={18} />Althea AI</button>}
           {account.role === 'student' && <button className={`nav-item ${isLibraryRoute && routePath !== libRoutes.myLearning ? 'active' : ''}`} aria-current={isLibraryRoute && routePath !== libRoutes.myLearning ? 'page' : undefined} onClick={() => { setProfileOpen(false); setMenuOpen(false); navigateTo(libRoutes.home) }}><BookOpen size={18} />Biblioteca matemática</button>}
-          {account.role === 'student' && <button className={`nav-item ${routePath === routes.garrettAi ? 'active' : ''}`} aria-current={routePath === routes.garrettAi ? 'page' : undefined} onClick={() => { setProfileOpen(false); setMenuOpen(false); navigate(routes.garrettAi) }}><Brain size={18} />Garrett AI</button>}
+          {account.role === 'student' && <button className={`nav-item ${routePath === routes.garrettAi ? 'active' : ''}`} aria-current={routePath === routes.garrettAi ? 'page' : undefined} onClick={() => { setProfileOpen(false); setMenuOpen(false); navigate(routes.garrettAi) }}><Brain size={18} />Althea AI</button>}
           {account.role === 'student' && <button className={`nav-item ${routePath === libRoutes.myLearning ? 'active' : ''}`} aria-current={routePath === libRoutes.myLearning ? 'page' : undefined} onClick={() => { setProfileOpen(false); setMenuOpen(false); navigateTo(libRoutes.myLearning) }}><Trophy size={18} />Mi aprendizaje</button>}
           {account.role === 'student' && <button className={`nav-item ${profileOpen ? 'active' : ''}`} aria-current={profileOpen ? 'page' : undefined} onClick={() => { setProfileStage(selectedStage || setupStage); setProfileYear(selectedYear || setupYear); setProfileOpen(true); setMenuOpen(false); navigate(routes.studentProfile); window.scrollTo({ top: 0, behavior: 'smooth' }) }}><UserRound size={18} />Perfil</button>}
         </nav>
@@ -471,10 +471,10 @@ function App() {
       <main className="main-content">
         <header className="topbar">
           <button className="mobile-menu icon-button" onClick={() => setMenuOpen(true)} aria-label="Abrir menú"><Menu size={21} /></button>
-          <div className="breadcrumb" data-route={routePath}>Mi espacio <ChevronRight size={15} /> <strong>{routePath === routes.garrettAi ? 'Garrett AI (Tutor)' : isLibraryRoute ? (routePath === libRoutes.myLearning ? 'Mi aprendizaje' : 'Biblioteca') : workspaceMode === 'teacher' ? 'Espacio docente' : profileOpen ? 'Mi perfil educativo' : selectedStage ?? 'Inicio'}</strong></div>
+          <div className="breadcrumb" data-route={routePath}>Mi espacio <ChevronRight size={15} /> <strong>{routePath === routes.garrettAi ? 'Althea AI (Tutor)' : isLibraryRoute ? (routePath === libRoutes.myLearning ? 'Mi aprendizaje' : 'Biblioteca') : workspaceMode === 'teacher' ? 'Espacio docente' : profileOpen ? 'Mi perfil educativo' : selectedStage ?? 'Inicio'}</strong></div>
           <div className="topbar-actions">
             {!isLibraryRoute && <form className="search-box" role="search" onSubmit={(e) => { e.preventDefault(); const q = search.trim(); if (q) navigateTo(`${libRoutes.home}?q=${encodeURIComponent(q)}`) }}><Search size={17} /><input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar un tema..." aria-label="Buscar un tema (Enter para buscar en la Biblioteca)" title="Pulsa Enter para buscar en la Biblioteca" /></form>}
-            <button className={`theme-toggle ${routePath === routes.garrettAi ? 'active' : ''}`} onClick={() => { setProfileOpen(false); navigate(routes.garrettAi) }} aria-label="Abrir tutor Garrett AI" title="Abrir tutor Garrett AI"><Brain size={18} /><span>Garrett AI</span></button>
+            <button className={`theme-toggle ${routePath === routes.garrettAi ? 'active' : ''}`} onClick={() => { setProfileOpen(false); navigate(routes.garrettAi) }} aria-label="Abrir tutor Althea AI" title="Abrir tutor Althea AI"><Brain size={18} /><span>Althea AI</span></button>
             <button className="theme-toggle" onClick={toggleTheme} aria-label={theme === 'light' ? 'Activar modo oscuro' : 'Activar modo claro'} title={theme === 'light' ? 'Activar modo oscuro' : 'Activar modo claro'}>{theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}<span>{theme === 'light' ? 'Modo oscuro' : 'Modo claro'}</span></button>
           </div>
         </header>
