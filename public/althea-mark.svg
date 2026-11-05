@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 190" fill="none">
+  <defs>
+    <linearGradient id="leaf" x1="35" y1="30" x2="160" y2="175" gradientUnits="userSpaceOnUse"><stop stop-color="#65BE82"/><stop offset=".48" stop-color="#159C83"/><stop offset="1" stop-color="#087B61"/></linearGradient>
+    <linearGradient id="gold" x1="151" y1="12" x2="246" y2="174" gradientUnits="userSpaceOnUse"><stop stop-color="#FFB13D"/><stop offset=".55" stop-color="#F68B24"/><stop offset="1" stop-color="#F5A623"/></linearGradient>
+    <linearGradient id="page" x1="205" y1="38" x2="250" y2="155" gradientUnits="userSpaceOnUse"><stop stop-color="#F8B43E"/><stop offset="1" stop-color="#078B79"/></linearGradient>
+  </defs>
+  <path d="M183 20 220 11v136h-14V34l-23 5V20Z" stroke="url(#page)" stroke-width="9" stroke-linejoin="round"/>
+  <path d="M199 34h37v126h-15V48h-22V34Z" stroke="#159B83" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M164 43h49v126h-14V57h-35V43Z" stroke="#39A982" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M24 48c35-2 62 15 67 43 3 16-2 31-13 43 3-24-7-43-28-54 9 14 12 28 8 42-19-8-31-24-34-48Z" fill="url(#leaf)"/>
+  <path d="M44 172c24-46 42-75 66-106 14-18 27-26 42-26 14 0 25 10 30 24 6 18-2 39-18 53-14 12-34 20-58 25-18 4-34 13-45 30H44Z" fill="url(#leaf)"/>
+  <path d="M92 171c20-35 45-57 78-74 20-10 36-25 45-48-1 33-17 59-44 76-18 12-41 20-58 30-8 5-14 10-21 16H92Z" fill="#0E8E6D"/>
+  <path d="M155 37c16-17 35-26 57-27v31c-9 4-17 10-25 19l-15 19-17-42Z" fill="url(#gold)"/>
+  <path d="M176 77c10-12 19-22 29-30l-2 52 46 73h-40l-33-95Z" fill="url(#gold)"/>
+  <path d="M164 54c-8 13-15 28-23 42" stroke="#F9A12E" stroke-width="8" stroke-linecap="round"/>
+</svg>
