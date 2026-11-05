@@ -428,3 +428,12 @@ button:focus-visible,input:focus-visible{outline:3px solid #9d8cff;outline-offse
 /* Althea identity: friendly green/orange symbol and deep-navy wordmark. */
 .auth-brand small{color:#84958e}
 .auth-brand .althea-brand-symbol{display:block}
+
+/* Althea identity system */
+.brand{gap:11px}
+.brand-mark-image{width:44px;height:44px;object-fit:contain;flex:0 0 auto}
+.brand strong{color:#17254b!important;font-size:21px;letter-spacing:-.8px}
+.brand strong span{color:#17254b}
+.auth-brand{gap:12px}
+.althea-brand-symbol{width:58px;height:58px;object-fit:contain;flex-shrink:0}
+.auth-brand strong{font-family:Manrope,sans-serif;font-weight:800;letter-spacing:-.8px;color:#17254b}
