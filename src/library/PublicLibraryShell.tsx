@@ -19,7 +19,7 @@ export default function PublicLibraryShell({ theme, onToggleTheme, onLogin, onRe
           <Link to={libRoutes.home}>{pathname === libRoutes.home ? <span aria-current="page">Biblioteca</span> : 'Biblioteca'}</Link>
           <Link to={libRoutes.myLearning}>{inLearning ? <span aria-current="page">Mi aprendizaje</span> : 'Mi aprendizaje'}</Link>
           <Link to="/universidad">Universidad</Link>
-          <Link to="/garrett-ai">{pathname === '/garrett-ai' ? <span aria-current="page">Garrett AI</span> : 'Garrett AI'}</Link>
+          <Link to="/garrett-ai">{pathname === '/garrett-ai' ? <span aria-current="page">Althea AI</span> : 'Althea AI'}</Link>
           <button type="button" onClick={onToggleTheme} aria-label={theme === 'light' ? 'Activar modo oscuro' : 'Activar modo claro'}>{theme === 'light' ? <Moon size={17} aria-hidden="true" /> : <Sun size={17} aria-hidden="true" />}</button>
           <button type="button" onClick={onLogin}>Iniciar sesión</button>
           <button type="button" className="lib-cta" onClick={onRegister}>Crear cuenta</button>
@@ -29,7 +29,7 @@ export default function PublicLibraryShell({ theme, onToggleTheme, onLogin, onRe
         <p className="lib-note lib-demo-banner" role="note">Estás explorando sin cuenta. Tu progreso y los temas guardados se almacenan solo en este navegador (modo demo){cloudAvailable ? '; inicia sesión para guardarlo en tu cuenta' : ''}.</p>
         {children}
       </main>
-      <footer className="auth-footer">Garrett Math V12.0.0 · Contenido de demostración, sin revisión docente</footer>
+      <footer className="auth-footer">Althea · Contenido de demostración, sin revisión docente</footer>
     </div>
   )
 }
