@@ -11,6 +11,7 @@ export const routes = {
   garrettAi: '/garrett-ai',
   teacherHome: '/profesor',
   familyHome: '/familia',
+  universityPreview: '/universidad',
 } as const
 
 export type AppRoute = typeof routes[keyof typeof routes]
