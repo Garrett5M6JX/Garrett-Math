@@ -18,6 +18,7 @@ export default function PublicLibraryShell({ theme, onToggleTheme, onLogin, onRe
         <nav className="lib-public-nav" aria-label="Navegación principal">
           <Link to={libRoutes.home}>{pathname === libRoutes.home ? <span aria-current="page">Biblioteca</span> : 'Biblioteca'}</Link>
           <Link to={libRoutes.myLearning}>{inLearning ? <span aria-current="page">Mi aprendizaje</span> : 'Mi aprendizaje'}</Link>
+          <Link to="/universidad">Universidad</Link>
           <Link to="/garrett-ai">{pathname === '/garrett-ai' ? <span aria-current="page">Garrett AI</span> : 'Garrett AI'}</Link>
           <button type="button" onClick={onToggleTheme} aria-label={theme === 'light' ? 'Activar modo oscuro' : 'Activar modo claro'}>{theme === 'light' ? <Moon size={17} aria-hidden="true" /> : <Sun size={17} aria-hidden="true" />}</button>
           <button type="button" onClick={onLogin}>Iniciar sesión</button>
