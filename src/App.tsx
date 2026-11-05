@@ -11,6 +11,7 @@ import LibraryApp from './library/LibraryApp'
 import AdminApp from './admin/AdminApp'
 import PublicLibraryShell from './library/PublicLibraryShell'
 import GarrettAiView from './components/garrett-ai/GarrettAiView'
+import UniversityPreview from './university/UniversityPreview'
 import { isLibraryPath, libRoutes } from './library/routes'
 import { useCatalog } from './hooks/useCatalog'
 import { useProgress } from './hooks/useProgress'
@@ -372,7 +373,7 @@ function App() {
       else if (!selectedStage) navigate('/configurar-perfil', true)
       else navigate('/estudiante', true)
     }
-    if (account?.role === 'teacher' && path !== '/profesor' && !isLibraryPath(path)) navigate('/profesor', true)
+    if (account?.role === 'teacher' && path !== '/profesor' && path !== routes.universityPreview && !isLibraryPath(path)) navigate('/profesor', true)
     if (account?.role === 'parent' && path !== '/familia') navigate('/familia', true)
     if (account?.role === 'student' && path === '/profesor') navigate('/estudiante', true)
   }, [account, authReady, selectedStage])
@@ -380,6 +381,8 @@ function App() {
   if (!authReady) return <div className="auth-shell"><div className="auth-card"><Brand /><p>Verificando tu sesión segura…</p></div></div>
 
   if (routePath === '/restablecer-contrasena') return <div className="auth-shell"><div className="auth-card"><Brand/><span className="auth-kicker">SEGURIDAD DE LA CUENTA</span><h1>Crear nueva contraseña</h1>{!authReady?<p>Verificando el enlace seguro de recuperación…</p>:!recoverySessionReady?<><p className="auth-error" role="alert">Este enlace no ha iniciado una sesión de recuperación válida o ya expiró.</p><p>Vuelve al inicio de sesión, selecciona «¿Olvidaste tu contraseña?» y solicita un enlace nuevo. Ábrelo en el mismo navegador donde vas a cambiar la contraseña.</p><button className="auth-primary" type="button" onClick={()=>navigateAuth('login')}>Volver al inicio de sesión <ChevronRight size={18}/></button></>:<><p>El enlace fue reconocido. Escribe una contraseña nueva para tu cuenta de Garrett Math.</p><form className="auth-form" onSubmit={updateRecoveredPassword}><label>Nueva contraseña<input type="password" value={recoveryPassword} onChange={e=>setRecoveryPassword(e.target.value)} autoComplete="new-password" minLength={8} required placeholder="Al menos 8 caracteres"/></label>{authError&&<p className="auth-error" role="alert">{authError}</p>}<button className="auth-primary" type="submit" disabled={recoveryBusy}>{recoveryBusy?'Actualizando…':'Guardar nueva contraseña'} <ChevronRight size={18}/></button></form></>}</div></div>
+  if (routePath === routes.universityPreview) return <UniversityPreview onBack={() => navigate(routes.home)} onLogin={() => navigate(routes.login)} />
+
   if (routePath === '/admin') return <AdminApp onExit={() => { if (account) navigate(account.role === 'teacher' ? '/profesor' : account.role === 'parent' ? '/familia' : '/estudiante'); else navigate('/iniciar-sesion') }} onNavigate={navigate} />
 
   if (!account && isLibraryPath(routePath)) return (
