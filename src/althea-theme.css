@@ -1,0 +1,131 @@
+/* Althea — sistema visual unificado basado en el símbolo original de la marca.
+   Se limita a presentación: no modifica lógica, rutas, permisos ni datos. */
+:root{
+  --althea-forest:#08785f;
+  --althea-green:#18a879;
+  --althea-teal:#079eaa;
+  --althea-mint:#e3f5ec;
+  --althea-mint-2:#f1faf5;
+  --althea-orange:#f2a23a;
+  --althea-orange-soft:#fff2df;
+  --althea-navy:#123b4a;
+  --althea-ink:#203b43;
+  --althea-muted:#71858a;
+  --althea-border:#dfece7;
+  --althea-surface:#ffffff;
+  --althea-bg:#f7faf8;
+}
+body{background:var(--althea-bg);color:var(--althea-ink)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline-color:var(--althea-teal)}
+.app-shell{background:var(--althea-bg)}
+.sidebar{border-right-color:var(--althea-border);background:#fff}
+.brand-mark{background:linear-gradient(145deg,var(--althea-green),var(--althea-teal));box-shadow:0 7px 16px #079eaa30}
+.brand strong{color:var(--althea-navy)}
+.brand strong span{color:var(--althea-green)}
+.brand small,.profile-copy small{color:var(--althea-muted)}
+.nav-item{color:#61777a}
+.nav-item:hover{background:var(--althea-mint-2);color:var(--althea-forest)}
+.nav-item.active{background:var(--althea-mint);color:var(--althea-forest)}
+.stage-subnav-item:hover,.stage-subnav-item.selected{background:var(--althea-mint-2);color:var(--althea-forest)}
+.stage-subnav{border-color:var(--althea-border)}
+.soon-tag,.future-pill{background:var(--althea-orange-soft);color:#a96112}
+.sidebar-divider,.sidebar-bottom{border-color:var(--althea-border)}
+.weekly-card{background:var(--althea-mint-2);border-color:var(--althea-border)}
+.weekly-icon{background:var(--althea-orange-soft);color:#bd741d}
+.profile-avatar{background:var(--althea-mint);color:var(--althea-forest)}
+.icon-button:hover{background:var(--althea-mint);color:var(--althea-forest)}
+.topbar{background:#ffffffeb;border-color:var(--althea-border)}
+.search-box{border-color:var(--althea-border);background:#fbfdfc}
+.eyebrow,.section-kicker,.lib-kicker{color:var(--althea-forest)}
+.welcome-row h1,.stage-heading-row h1,.stage-courses-heading h2,.profile-hero h1{color:var(--althea-navy)}
+.welcome-row h1 span,.stage-heading-row h1 span,.auth-card h1 em{color:var(--althea-green)}
+.art-center{background:linear-gradient(145deg,var(--althea-green),var(--althea-teal));box-shadow:0 16px 30px #079eaa30}
+.math-tile{color:var(--althea-forest)}
+.tile-equals,.sparkle-a{color:var(--althea-orange)}
+.stats-grid .stat-purple{background:var(--althea-mint);color:var(--althea-forest)}
+.continue-card{background:linear-gradient(115deg,#e4f5ec,#f4fbf7 70%,#fff3e3);border-color:#d8ebe1}
+.continue-copy .section-kicker{color:var(--althea-forest)}
+.book-shape{color:var(--althea-forest)}
+.primary-button,.auth-primary{background:var(--althea-forest);border-color:var(--althea-forest);box-shadow:0 5px 12px #08785f20}
+.primary-button:hover,.auth-primary:hover{background:#06634f;border-color:#06634f}
+.text-button,.course-link{color:var(--althea-forest)}
+.filter-chip:hover{border-color:#8bcfba;color:var(--althea-forest)}
+.filter-chip.selected{background:var(--althea-forest);border-color:var(--althea-forest);color:#fff;box-shadow:0 4px 9px #08785f20}
+.course-progress span{background:linear-gradient(90deg,var(--althea-green),var(--althea-teal))}
+.future-banner{background:var(--althea-mint-2);border-color:var(--althea-border)}
+.future-icon{background:var(--althea-mint);color:var(--althea-forest)}
+.stage-hero{background:linear-gradient(115deg,#fff 0%,#eff8f3 65%,#fff3e5 100%);border-color:var(--althea-border)}
+.stage-age{background:var(--althea-mint-2);border-color:#cfe8dc;color:var(--althea-forest)}
+.stage-hero-art{background:var(--althea-mint)}
+.stage-hero-art.lavender{background:#e8f4f4}
+.stage-art-circle{color:var(--althea-forest)}
+.stage-art-symbol{color:var(--althea-green)}
+.stage-year-panel,.subject-card,.stage-course-card,.profile-editor{border-color:var(--althea-border)}
+.subject-icon,.stage-card-icon,.profile-hero-icon,.stage-course-number{background:var(--althea-mint);color:var(--althea-forest)}
+.subject-icon.lavender{background:#e7f4f3;color:#087c83}
+.subject-icon.blue{background:#e8f2f8;color:#286b85}
+.subject-icon.pink{background:var(--althea-orange-soft);color:#ad6818}
+.subject-card:hover,.stage-course-card:hover{border-color:#a6d9c5}
+.subject-card>button,.stage-course-card>svg{color:var(--althea-forest)}
+.stage-roadmap-note,.profile-stage-note{background:var(--althea-mint-2);border-color:var(--althea-border);color:var(--althea-forest)}
+.stage-roadmap-note>div{background:var(--althea-mint);color:var(--althea-forest)}
+.stage-roadmap-note strong,.profile-stage-note strong{color:var(--althea-forest)}
+.content-lesson-hero{background:linear-gradient(120deg,#eff8f3,#fff 65%,#fff3e5);border-color:var(--althea-border)}
+.example-card,.worksheet-preview{background:#f3faf6;border-color:#d8ebe1}
+.lesson-steps-card li span,.auth-feature-list svg{background:var(--althea-mint);color:var(--althea-forest)}
+.content-answer:hover,.content-answer:focus-visible{border-color:#70bda2;outline-color:#d5eee3}
+.content-answer-feedback.good{background:#e8f6ee;color:#176d4f}
+.next-lesson-strip{background:linear-gradient(110deg,#f0f8f3,#fff4e7);border-color:var(--althea-border)}
+.auth-shell{background:radial-gradient(ellipse at 15% 10%,#dff2e8 0,transparent 36%),radial-gradient(ellipse at 90% 85%,#fff0d9 0,transparent 34%),var(--althea-bg);color:var(--althea-ink)}
+.auth-card{border-color:var(--althea-border);box-shadow:0 24px 70px #174c3c12}
+.auth-brand strong{color:var(--althea-navy)}
+.auth-kicker{color:var(--althea-forest)}
+.auth-feature-list svg{background:var(--althea-mint);color:var(--althea-forest)}
+.auth-primary{color:#fff}
+.auth-secondary{border-color:var(--althea-border);color:var(--althea-navy)}
+.role-option{color:var(--althea-forest);border-color:var(--althea-border)}
+.role-option:hover{border-color:#9bcfba;background:var(--althea-mint-2)}
+.auth-card select,.child-form select,.year-select-label select,.teacher-form-grid select{background-color:#fbfdfc;border-color:var(--althea-border)}
+.auth-card select:hover,.child-form select:hover,.year-select-label select:hover,.teacher-form-grid select:hover{border-color:#91cdb6;background-color:var(--althea-mint-2)}
+.auth-card select:focus-visible,.child-form select:focus-visible,.year-select-label select:focus-visible,.teacher-form-grid select:focus-visible{border-color:var(--althea-teal);box-shadow:0 0 0 4px #079eaa20}
+.althea-brand-symbol{object-fit:contain}
+.toast{background:var(--althea-navy)}
+/* Biblioteca: mismo sistema cromático, con contraste semántico conservado. */
+.gm-lib,.lib-public{--l-text:#203b43;--l-muted:#637a7e;--l-card:#fff;--l-border:#dfece7;--l-soft:#f0f8f3;--l-primary:#08785f;--l-primary-h:#06634f;--l-link:#08785f;--l-focus:#079eaa}
+.theme-dark .gm-lib,.theme-dark.lib-public{--l-text:#e7f3ef;--l-muted:#a9c0b8;--l-card:#182b2c;--l-border:#2d4b47;--l-soft:#203a37;--l-primary:#35bd91;--l-primary-h:#25a77e;--l-link:#70d7b1;--l-focus:#54cdb0;--l-ok:#8de0b2;--l-ok-bg:#183a29;--l-warn:#ffd27a;--l-warn-bg:#3d3114;--l-err:#ffb4a9;--l-err-bg:#43201c;--vis-ink:#e7f3ef;--vis-cell:#203a37}
+.theme-dark .stage-hero,.theme-dark .content-lesson-hero{background:linear-gradient(115deg,#182b2c,#203a37 68%,#403323);border-color:#2d4b47}
+.theme-dark .stage-roadmap-note,.theme-dark .profile-stage-note{background:#203a37;border-color:#2d5a4e;color:#a8e8cd}
+.theme-dark .stage-roadmap-note strong,.theme-dark .profile-stage-note strong{color:#a8e8cd}
+.theme-dark .example-card,.theme-dark .worksheet-preview{background:#203a37;border-color:#2d5a4e}
+.theme-dark .next-lesson-strip{background:linear-gradient(110deg,#203a37,#403323);border-color:#2d4b47}
+/* Administración: neutral, limpia y coherente con el verde institucional de Althea. */
+.admin-shell{--admin-bg:#f6faf7;--admin-surface:#fff;--admin-text:#203b43;--admin-muted:#71858a;--admin-border:#dfece7;--admin-accent:#08785f;--admin-accent-soft:#e3f5ec;background:var(--admin-bg);color:var(--admin-text)}
+.admin-sidebar{border-right-color:var(--admin-border)}
+.admin-sidebar nav button.active,.admin-sidebar nav button:hover{background:var(--admin-accent-soft);color:#08785f}
+.admin-sidebar nav button:focus-visible,.admin-shell button:focus-visible,.admin-shell input:focus-visible,.admin-shell select:focus-visible,.admin-shell textarea:focus-visible{outline-color:#079eaa}
+.admin-welcome .admin-eyebrow,.admin-welcome>svg,.admin-stats article svg{color:var(--admin-accent)}
+.admin-welcome{background:linear-gradient(120deg,#fff,#eff8f3);border-color:var(--admin-border)}
+.admin-button{background:#08785f;border-color:#08785f}
+.admin-button:hover{background:#06634f}
+.admin-action-grid button:hover{border-color:#91cdb6;background:#f0f8f3}
+.admin-editor,.admin-note{background:#f0f8f3;border-color:#d8ebe1;color:#315c50}
+.admin-preview-banner{border-color:#efc27f;background:#fff4e3;color:#855516}
+.admin-card>svg{color:#08785f}
+/* El espacio docente conserva el Kelly green solicitado como identidad de rol. */
+.teacher-mode .brand-mark{background:#3d9f12;box-shadow:0 7px 16px #3d9f1230}
+.teacher-mode .nav-item.active{background:#eaf8e3;color:#287c0b}
+.teacher-mode .nav-item:hover{background:#f2faed;color:#287c0b}
+.teacher-mode .primary-button{background:#3d9f12;border-color:#3d9f12}
+.teacher-mode .primary-button:hover{background:#2d7e0b}
+.teacher-mode .section-kicker{color:#398d19}
+.teacher-hero{background:linear-gradient(125deg,#0b4939,#126b4d 72%,#0d5356);border-color:#1b7658}
+.teacher-hero h1{color:#fff}
+.teacher-hero h1 span{color:#a8e8cd}
+.teacher-hero>p{color:#d4eee3}
+.teacher-stat-icon,.teacher-resource-icon{background:#eaf8e3;color:#287c0b}
+.teacher-roadmap-note{background:#f0f8e9;border-color:#d7ebc9;color:#287c0b}
+.teacher-roadmap-note strong{color:#236608}
+.theme-dark .teacher-hero{background:linear-gradient(125deg,#092f27,#104b38 72%,#103e43);border-color:#1b7658}
+.theme-dark .teacher-hero h1{color:#fff}
+.theme-dark .teacher-hero>p{color:#d4eee3}
+@media(prefers-reduced-motion:reduce){.course-card,.subject-card,.stage-course-card{transition:none}}
