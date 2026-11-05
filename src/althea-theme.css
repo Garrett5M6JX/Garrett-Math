@@ -129,3 +129,64 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .theme-dark .teacher-hero h1{color:#fff}
 .theme-dark .teacher-hero>p{color:#d4eee3}
 @media(prefers-reduced-motion:reduce){.course-card,.subject-card,.stage-course-card{transition:none}}
+
+/* Fondo de acceso Althea: capas orgánicas inspiradas en el movimiento del logo.
+   Mantiene el formulario legible y evita una pantalla blanca plana. */
+.auth-shell{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  background:
+    radial-gradient(ellipse at 8% 18%,rgba(24,168,121,.22) 0,rgba(24,168,121,0) 34%),
+    radial-gradient(ellipse at 92% 82%,rgba(242,162,58,.20) 0,rgba(242,162,58,0) 30%),
+    radial-gradient(ellipse at 78% 8%,rgba(7,158,170,.15) 0,rgba(7,158,170,0) 28%),
+    linear-gradient(135deg,#eaf7f0 0%,#f4faf7 48%,#fff7eb 100%);
+}
+.auth-shell::before{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  width:min(48vw,590px);
+  aspect-ratio:1;
+  left:-12%;
+  top:8%;
+  border:1px solid rgba(8,120,95,.15);
+  border-radius:58% 42% 64% 36% / 43% 57% 43% 57%;
+  background:linear-gradient(145deg,rgba(24,168,121,.10),rgba(7,158,170,.035) 58%,transparent 72%);
+  transform:rotate(-18deg);
+}
+.auth-shell::after{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  width:min(40vw,490px);
+  aspect-ratio:1;
+  right:-9%;
+  bottom:-18%;
+  border:1px solid rgba(242,162,58,.24);
+  border-radius:42% 58% 38% 62% / 57% 43% 57% 43%;
+  background:
+    radial-gradient(circle at 50% 50%,rgba(242,162,58,.13) 0 2px,transparent 3px),
+    linear-gradient(35deg,rgba(242,162,58,.10),rgba(7,158,170,.055));
+  background-size:22px 22px,auto;
+  transform:rotate(20deg);
+}
+.auth-card{
+  position:relative;
+  background:rgba(255,255,255,.94);
+  border:1px solid rgba(8,120,95,.14);
+  box-shadow:0 28px 85px rgba(18,59,74,.13),0 4px 16px rgba(8,120,95,.05);
+  backdrop-filter:blur(12px);
+}
+.auth-kicker{color:var(--althea-forest)}
+.auth-card h1 em{color:var(--althea-green)}
+.auth-primary{background:linear-gradient(105deg,var(--althea-forest),var(--althea-teal));border-color:transparent;box-shadow:0 8px 18px rgba(8,120,95,.18)}
+.auth-primary:hover{background:linear-gradient(105deg,#06634f,#07838d)}
+.auth-form input:not([type=checkbox]):focus,.auth-card select:focus,.child-form input:focus,.child-form select:focus{border-color:var(--althea-teal);box-shadow:0 0 0 3px rgba(7,158,170,.12);outline:none}
+@media(max-width:680px){
+  .auth-shell{padding:22px 14px;background:radial-gradient(ellipse at 0 0,rgba(24,168,121,.19),transparent 44%),radial-gradient(ellipse at 100% 100%,rgba(242,162,58,.16),transparent 40%),linear-gradient(145deg,#edf8f2,#f8fbf8 60%,#fff7eb)}
+  .auth-shell::before{width:78vw;left:-42%;top:5%}
+  .auth-shell::after{width:68vw;right:-35%;bottom:-8%}
+  .auth-card{backdrop-filter:blur(8px)}
+}
+@media(prefers-reduced-motion:reduce){.auth-shell::before,.auth-shell::after{transform:none}}
