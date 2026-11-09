@@ -13,6 +13,7 @@ import PublicLibraryShell from './library/PublicLibraryShell'
 import GarrettAiView from './components/garrett-ai/GarrettAiView'
 import UniversityPreview from './university/UniversityPreview'
 import TeacherAssignments from './assignments/TeacherAssignments'
+import StudentAssignments from './assignments/StudentAssignments'
 import { isLibraryPath, libRoutes } from './library/routes'
 import { useCatalog } from './hooks/useCatalog'
 import { useProgress } from './hooks/useProgress'
@@ -575,6 +576,7 @@ function App() {
             </div>
           </section>
 
+          <StudentAssignments />
           <section className="stats-grid" aria-label="Resumen de aprendizaje">
             <div className="stat-card"><div className="stat-icon stat-mint"><BookOpen size={20} /></div><div><span>Biblioteca</span><strong>{librarySummary ? `${librarySummary.total} lecciones` : 'Cargando…'}</strong><small>Preescolar y Primaria (borrador)</small></div></div>
             <div className="stat-card"><div className="stat-icon stat-purple"><Target size={20} /></div><div><span>Tu avance</span><strong>{librarySummary ? `${librarySummary.completed} completadas` : '—'}</strong><small>Solo cuentan las lecciones terminadas</small></div></div>
