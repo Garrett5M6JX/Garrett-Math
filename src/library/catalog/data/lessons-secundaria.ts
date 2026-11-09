@@ -83,4 +83,36 @@ export const secundariaLessons: Lesson[] = [
     ],
     sum: ['En y = mx + b, m es la pendiente.', 'b es la intersección con el eje vertical.', 'Sustituye x para calcular la salida y.'],
   }),
+  lesson({
+    id: 'sec-trigonometria-basica', topic: 'sec-4-razones-trigonometricas', title: 'Seno, coseno y tangente',
+    obj: 'Relacionar los lados de un triángulo rectángulo con sus razones trigonométricas.', min: 16, d: 3,
+    tags: ['trigonometria', 'seno', 'coseno', 'tangente'],
+    secs: [
+      sec('Identificar los lados', 'Respecto a un ángulo agudo, la hipotenusa está frente al ángulo recto. Los otros dos lados son el cateto opuesto y el cateto adyacente.'),
+      sec('Tres razones fundamentales', 'Seno = cateto opuesto / hipotenusa. Coseno = cateto adyacente / hipotenusa. Tangente = cateto opuesto / cateto adyacente.', { key: 'SOH–CAH–TOA ayuda a recordar las razones.' }),
+    ],
+    ex: ex('Calcular una razón', 'En un triángulo rectángulo, el cateto opuesto mide 3 y la hipotenusa 5. ¿Cuál es el seno del ángulo?', ['Seno = opuesto / hipotenusa.', 'Sustituye: 3 / 5.', 'El valor es 0,6.'], 'El seno es 3/5 = 0,6.'),
+    exs: [
+      nm('Si el cateto opuesto mide 4 y la hipotenusa 5, ¿cuánto vale el seno multiplicado por 10?', 8, 'Seno = 4/5 = 0,8; multiplicado por 10 es 8.', ['Divide 4 entre 5.', 'Multiplica el resultado por 10.']),
+      ch('¿Qué lado está frente al ángulo recto?', ['Cateto adyacente', 'Hipotenusa', 'Cateto opuesto al ángulo agudo'], 1, 'La hipotenusa siempre está frente al ángulo recto.', ['Es el lado más largo.']),
+      ch('¿Qué razón es cateto opuesto / hipotenusa?', ['Coseno', 'Tangente', 'Seno'], 2, 'Esa es la definición del seno.', ['Recuerda SOH.']),
+    ],
+    sum: ['Identifica primero el ángulo de referencia.', 'Seno = opuesto/hipotenusa.', 'Coseno = adyacente/hipotenusa.', 'Tangente = opuesto/adyacente.'],
+  }),
+  lesson({
+    id: 'sec-exponenciales-intro', topic: 'sec-5-exponenciales-logaritmos', title: 'Crecimiento exponencial',
+    obj: 'Reconocer un crecimiento multiplicativo y calcular valores de una función exponencial sencilla.', min: 15, d: 3,
+    tags: ['exponenciales', 'crecimiento', 'funciones'],
+    secs: [
+      sec('Sumar no es lo mismo que multiplicar', 'En un crecimiento aditivo se añade siempre la misma cantidad. En uno multiplicativo se multiplica por un mismo factor en cada paso.'),
+      sec('Modelo exponencial', 'Una forma básica es f(x) = a · bˣ. El valor a es el inicial y b es el factor multiplicativo por cada unidad de x.', { key: 'Si se duplica cada paso: f(x) = a · 2ˣ.' }),
+    ],
+    ex: ex('Una cantidad se duplica', 'Comienza con 5 y se duplica tres veces. ¿Cuál es el valor final?', ['Valor inicial: 5.', 'Después de una duplicación: 10; luego 20.', 'Tercera duplicación: 40.'], 'El valor final es 40.'),
+    exs: [
+      nm('Calcula 3 · 2².', 12, '2² = 4 y 3 · 4 = 12.', ['Calcula primero la potencia.']),
+      ch('En f(x) = 7 · 3ˣ, ¿cuál es el valor inicial f(0)?', ['0', '7', '3'], 1, '3⁰ = 1, por lo que f(0) = 7 · 1 = 7.', ['Toda base no nula elevada a cero vale 1.']),
+      ch('Si una cantidad se multiplica por 4 en cada paso, el factor es…', ['4', '2', '1/4'], 0, 'El factor multiplicativo por paso es 4.', ['Busca por cuánto se multiplica cada vez.']),
+    ],
+    sum: ['El crecimiento exponencial multiplica por un factor constante.', 'En a · bˣ, a es el valor inicial y b el factor.', 'Una potencia representa repeticiones multiplicativas.'],
+  }),
 ]
