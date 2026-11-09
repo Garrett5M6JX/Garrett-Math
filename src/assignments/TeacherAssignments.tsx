@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { supabase } from '../services/supabase'
 import {
   createAssignment, gradeAssignmentSubmission, listAssignmentSubmissions,
@@ -8,7 +8,6 @@ import { BookOpenCheck, CalendarClock, CheckCircle2, ClipboardList, LoaderCircle
 import './assignments.css'
 
 type Classroom = { id: string; name: string; stage: string; education_year: string }
-const stages = ['Preescolar', 'Primaria', 'Secundaria', 'Universidad']
 
 export default function TeacherAssignments() {
   const [classrooms, setClassrooms] = useState<Classroom[]>([])
@@ -18,8 +17,6 @@ export default function TeacherAssignments() {
   const [submissions, setSubmissions] = useState<AssignmentSubmission[]>([])
   const [title, setTitle] = useState('')
   const [instructions, setInstructions] = useState('')
-  const [stage, setStage] = useState('Primaria')
-  const [year, setYear] = useState('1.º grado')
   const [dueAt, setDueAt] = useState('')
   const [score, setScore] = useState<Record<string, string>>({})
   const [feedback, setFeedback] = useState<Record<string, string>>({})
@@ -65,7 +62,7 @@ export default function TeacherAssignments() {
     finally { setLoading(false) }
   }
 
-  const create = async (event: React.FormEvent) => {
+  const create = async (event: FormEvent) => {
     event.preventDefault()
     if (!supabase || !classroomId || !title.trim()) return
     const classroom = classrooms.find((item) => item.id === classroomId)
