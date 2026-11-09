@@ -83,7 +83,7 @@ export default function TeacherGradebook() {
   const average = gradedCount ? submissions.filter((item) => item.score !== null).reduce((sum, item) => sum + Number(item.score), 0) / gradedCount : null
 
   const exportCsv = () => {
-    const headers = ['Estudiante', ...assignments.map((item) => item.title), 'Promedio', 'Calificadas', 'Pendientes']
+    const headers = ['Estudiante', ...assignments.map((item) => item.title), 'Promedio', 'Calificadas', 'Por calificar', 'Sin entregar']
     const lines = [headers.map(csvCell).join(';'), ...rows.map((row) => [
       row.name, ...assignments.map((item) => {
         const grade = row.grades.get(item.id)
