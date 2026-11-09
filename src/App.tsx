@@ -576,7 +576,7 @@ function App() {
             </div>
           </section>
 
-          <StudentAssignments />
+          {account.role === 'student' && <StudentAssignments />}
           <section className="stats-grid" aria-label="Resumen de aprendizaje">
             <div className="stat-card"><div className="stat-icon stat-mint"><BookOpen size={20} /></div><div><span>Biblioteca</span><strong>{librarySummary ? `${librarySummary.total} lecciones` : 'Cargando…'}</strong><small>Preescolar y Primaria (borrador)</small></div></div>
             <div className="stat-card"><div className="stat-icon stat-purple"><Target size={20} /></div><div><span>Tu avance</span><strong>{librarySummary ? `${librarySummary.completed} completadas` : '—'}</strong><small>Solo cuentan las lecciones terminadas</small></div></div>
