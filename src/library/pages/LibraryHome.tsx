@@ -53,7 +53,7 @@ export default function LibraryHome({ catalog, progress, favorites, preferredGra
   return (
     <>
       <section className="lib-hero" aria-labelledby="lib-title">
-        <span className="lib-kicker">BIBLIOTECA MATEMÁTICA · PREESCOLAR Y PRIMARIA</span>
+        <span className="lib-kicker">BIBLIOTECA MATEMÁTICA · PREESCOLAR A UNIVERSIDAD</span>
         <h1 id="lib-title">Explora, aprende y practica</h1>
         <p>Busca un concepto o recorre los temas por etapa, grado y área. Cada lección incluye explicación, ejemplo resuelto y ejercicios con pistas.</p>
         <form className="lib-search" role="search" onSubmit={(e) => e.preventDefault()}>
@@ -82,7 +82,7 @@ export default function LibraryHome({ catalog, progress, favorites, preferredGra
               {catalog.stages.map((stage) => {
                 const lessons = lessonsOfStage(catalog, stage.id); const agg = aggregate(lessons, progress.map)
                 return <article key={stage.id} className="lib-card lib-stage-card">
-                  <span className="lib-kicker">{stage.ageRange}</span><h3><Link to={libRoutes.stage(stage.id)} className="lib-card-link">{stage.name}</Link></h3>
+                  <span className="lib-kicker">{stage.ageRange} · {stage.status === 'planned' ? 'EN PREPARACIÓN' : 'CONTENIDO DISPONIBLE'}</span><h3><Link to={libRoutes.stage(stage.id)} className="lib-card-link">{stage.name}</Link></h3>
                   <p className="lib-card-desc">{stage.description}</p>
                   <ProgressBar percent={agg.percent} label={`Avance en ${stage.name}`} detail={`${agg.completed} de ${plural(agg.total, 'lección', 'lecciones')} completadas`} />
                 </article>

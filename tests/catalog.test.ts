@@ -7,13 +7,22 @@ import { catalog, clone } from './fixtures'
 test('el catálogo incluido es válido (referencias, ejercicios, pistas, textos alternativos)', () => {
   assert.deepEqual(validateCatalog(rawCatalog), [])
 })
-test('el catálogo contiene solo Preescolar y Primaria con contenido real', () => {
-  assert.deepEqual(catalog.stages.map((s) => s.id), ['preescolar', 'primaria'])
+test('el mapa curricular contempla las cuatro etapas y conserva contenido real en las dos iniciales', () => {
+  assert.deepEqual(catalog.stages.map((s) => s.id), ['preescolar', 'primaria', 'secundaria', 'universidad'])
+  assert.equal(catalog.gradesByStage.get('secundaria')?.length, 5)
+  assert.equal(catalog.gradesByStage.get('universidad')?.length, 5)
+  assert.equal(catalog.stages.find((s) => s.id === 'secundaria')?.status, 'planned')
+  assert.equal(catalog.stages.find((s) => s.id === 'universidad')?.status, 'planned')
   assert.equal(catalog.gradesByStage.get('preescolar')?.length, 3)
   assert.equal(catalog.gradesByStage.get('primaria')?.length, 6)
   assert.ok(catalog.lessons.length >= 40, `lecciones: ${catalog.lessons.length}`)
   for (const grade of catalog.grades) {
     const count = [...(catalog.unitsByGrade.get(grade.id) ?? [])].flatMap((u) => catalog.topicsByUnit.get(u.id) ?? []).flatMap((t) => catalog.lessonsByTopic.get(t.id) ?? []).length
+    const stage = catalog.stageById.get(grade.stageId)
+    if (stage?.status === 'planned') {
+      assert.equal(count, 0, `el grado planificado ${grade.id} no debe aparentar contenido publicado`)
+      continue
+    }
     assert.ok(count >= 3, `el grado ${grade.id} tiene solo ${count} lecciones`)
   }
 })

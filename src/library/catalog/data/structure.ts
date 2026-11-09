@@ -2,7 +2,9 @@ import type { Area, Grade, Stage, Unit } from '../../types.js'
 
 export const stages: Stage[] = [
   { id: 'preescolar', name: 'Preescolar', ageRange: '3–5 años', order: 1, description: 'Descubrir los números, las formas y los patrones jugando, observando y manipulando.' },
-  { id: 'primaria', name: 'Primaria', ageRange: '6–11 años', order: 2, description: 'Construir una base sólida: números, operaciones, fracciones, geometría, medida y datos.' },
+  { id: 'primaria', name: 'Primaria', ageRange: '6–11 años', order: 2, description: 'Construir una base sólida: números, operaciones, fracciones, geometría, medida y datos.', status: 'available' },
+  { id: 'secundaria', name: 'Secundaria', ageRange: '12–17 años', order: 3, description: 'Profundizar en álgebra, funciones, geometría, estadística y resolución de problemas.', status: 'planned' },
+  { id: 'universidad', name: 'Universidad', ageRange: 'Nivel superior', order: 4, description: 'Avanzar hacia el razonamiento formal, el cálculo, el álgebra lineal y sus aplicaciones.', status: 'planned' },
 ]
 
 export const grades: Grade[] = [
@@ -15,6 +17,16 @@ export const grades: Grade[] = [
   { id: 'pri-4', stageId: 'primaria', name: '4.º grado', order: 7 },
   { id: 'pri-5', stageId: 'primaria', name: '5.º grado', order: 8 },
   { id: 'pri-6', stageId: 'primaria', name: '6.º grado', order: 9 },
+  { id: 'sec-1', stageId: 'secundaria', name: '1.º año', order: 10 },
+  { id: 'sec-2', stageId: 'secundaria', name: '2.º año', order: 11 },
+  { id: 'sec-3', stageId: 'secundaria', name: '3.º año', order: 12 },
+  { id: 'sec-4', stageId: 'secundaria', name: '4.º año', order: 13 },
+  { id: 'sec-5', stageId: 'secundaria', name: '5.º año', order: 14 },
+  { id: 'uni-inicial', stageId: 'universidad', name: 'Curso inicial', order: 15 },
+  { id: 'uni-calculo-1', stageId: 'universidad', name: 'Cálculo I', order: 16 },
+  { id: 'uni-calculo-2', stageId: 'universidad', name: 'Cálculo II', order: 17 },
+  { id: 'uni-algebra-lineal', stageId: 'universidad', name: 'Álgebra lineal', order: 18 },
+  { id: 'uni-discreta', stageId: 'universidad', name: 'Matemática discreta', order: 19 },
 ]
 
 export const areas: Area[] = [
