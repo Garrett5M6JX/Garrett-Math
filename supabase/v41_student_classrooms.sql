@@ -37,7 +37,7 @@ begin
  if not found then raise exception 'No encontramos un aula con ese código.'; end if;
 
  insert into public.gm_classroom_members(classroom_id,student_id,added_by)
- values(v_classroom.id,(select auth.uid()),v_classroom.teacher_id)
+ values(v_classroom.id,(select auth.uid()),(select auth.uid()))
  on conflict(classroom_id,student_id) do nothing;
 
  return jsonb_build_object(
