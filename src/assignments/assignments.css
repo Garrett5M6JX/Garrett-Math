@@ -35,3 +35,6 @@
 .assignment-spin{animation:assignment-spin 1s linear infinite}
 @keyframes assignment-spin{to{transform:rotate(360deg)}}
 @media(max-width:760px){.assignment-center{padding:17px}.assignment-layout,.assignment-submission-list article{grid-template-columns:1fr}.assignment-center-heading{align-items:flex-start;flex-direction:column}.assignment-submission-list article{gap:12px}}
+
+.assignment-join-code{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0;padding:9px 11px;border:1px dashed var(--accent,#16a085);border-radius:10px;color:var(--text-muted,#657783);font-size:.85rem}
+.assignment-join-code strong{padding:3px 8px;border-radius:6px;background:var(--surface,#fff);color:var(--text-primary,#243746);font-size:.95rem;letter-spacing:.1em}
