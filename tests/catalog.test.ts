@@ -18,6 +18,11 @@ test('el mapa curricular contempla las cuatro etapas y conserva contenido real e
   assert.ok(catalog.lessons.length >= 40, `lecciones: ${catalog.lessons.length}`)
   for (const grade of catalog.grades) {
     const count = [...(catalog.unitsByGrade.get(grade.id) ?? [])].flatMap((u) => catalog.topicsByUnit.get(u.id) ?? []).flatMap((t) => catalog.lessonsByTopic.get(t.id) ?? []).length
+    const stage = catalog.stageById.get(grade.stageId)
+    if (stage?.status === 'planned') {
+      assert.equal(count, 0, `el grado planificado ${grade.id} no debe aparentar contenido publicado`)
+      continue
+    }
     assert.ok(count >= 3, `el grado ${grade.id} tiene solo ${count} lecciones`)
   }
 })
