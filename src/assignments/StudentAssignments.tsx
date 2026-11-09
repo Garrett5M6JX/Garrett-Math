@@ -50,17 +50,11 @@ export default function StudentAssignments() {
   }
 
   const deliver = async (assignment: ClassroomAssignment) => {
-    let parsed: Record<string, unknown>
-    try {
-      const raw = responses[assignment.id]?.trim() ?? ''
-      if (!raw) throw new Error('Escribe tu respuesta antes de entregar.')
-      const value: unknown = JSON.parse(raw)
-      if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('La respuesta debe ser un objeto JSON, por ejemplo: {"respuesta":"12"}.')
-      parsed = value as Record<string, unknown>
-    } catch (e) { setError(e instanceof Error ? e.message : 'Revisa el formato de tu respuesta.'); return }
+    const raw = responses[assignment.id]?.trim() ?? ''
+    if (!raw) { setError('Escribe tu respuesta antes de entregar.'); return }
     setSaving(true); setError(''); setNotice('')
     try {
-      await deliverStudentAssignment(assignment.id, parsed)
+      await deliverStudentAssignment(assignment.id, { respuesta: raw })
       setNotice('Tu tarea fue entregada correctamente.')
       setResponses((old) => ({ ...old, [assignment.id]: '' }))
       const [mine, current] = await Promise.all([listMyAssignmentSubmissions(), listStudentAssignments(activeClassroom)])
@@ -85,7 +79,7 @@ export default function StudentAssignments() {
           <div className="student-assignment-card-heading"><div><span className="section-kicker">ACTIVIDAD DE CLASE</span><h3>{assignment.title}</h3></div><span className={submission?.score !== null && submission?.score !== undefined ? 'student-status graded' : submission ? 'student-status sent' : expired ? 'student-status closed' : 'student-status pending'}>{submission?.score !== null && submission?.score !== undefined ? 'Calificada' : submission ? 'Entregada' : expired ? 'Plazo vencido' : 'Pendiente'}</span></div>
           {assignment.instructions && <p className="student-assignment-instructions">{assignment.instructions}</p>}
           <p className="student-assignment-deadline"><CalendarClock size={15}/>{assignment.due_at ? 'Fecha límite: ' + new Date(assignment.due_at).toLocaleString() : 'Sin fecha límite'}</p>
-          {submission ? <div className="student-submission-feedback"><CheckCircle2 size={17}/><div><strong>{submission.score !== null ? 'Calificación: ' + submission.score + '/100' : 'Entrega registrada'}</strong>{submission.feedback && <p>{submission.feedback}</p>}<small>Enviada el {new Date(submission.submitted_at).toLocaleString()}</small></div></div> : <div className="student-delivery-form"><label>Tu respuesta (formato JSON sencillo)<textarea rows={3} value={responses[assignment.id] ?? ''} onChange={(e) => setResponses((old) => ({ ...old, [assignment.id]: e.target.value }))} placeholder={'{"respuesta":"Escribe aquí tu solución"}'} disabled={expired}/></label><button className="primary-button" onClick={() => void deliver(assignment)} disabled={saving || expired}><Send size={16}/> Entregar tarea</button></div>}
+          {submission ? <div className="student-submission-feedback"><CheckCircle2 size={17}/><div><strong>{submission.score !== null ? 'Calificación: ' + submission.score + '/100' : 'Entrega registrada'}</strong>{submission.feedback && <p>{submission.feedback}</p>}<small>Enviada el {new Date(submission.submitted_at).toLocaleString()}</small></div></div> : <div className="student-delivery-form"><label>Tu respuesta<textarea rows={3} value={responses[assignment.id] ?? ''} onChange={(e) => setResponses((old) => ({ ...old, [assignment.id]: e.target.value }))} placeholder="Escribe tu solución o procedimiento aquí…" disabled={expired}/></label><button className="primary-button" onClick={() => void deliver(assignment)} disabled={saving || expired}><Send size={16}/> Entregar tarea</button></div>}
         </article>
       })}{!assignments.length && <div className="student-assignment-empty compact"><BookOpenCheck size={26}/><strong>No hay tareas publicadas</strong><span>Cuando tu docente publique una actividad, aparecerá aquí.</span></div>}</div>
     </>}
