@@ -1,0 +1,37 @@
+.assignment-center{margin:28px 0;padding:26px;border:1px solid var(--border-color,rgba(30,55,70,.12));border-radius:22px;background:var(--surface,#fff);box-shadow:0 12px 34px rgba(22,48,60,.06)}
+.assignment-center-heading,.assignment-submissions-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px}
+.assignment-center-heading h2{display:flex;align-items:center;gap:10px;margin:7px 0;font-size:1.45rem}
+.assignment-center-heading p{margin:0;color:var(--text-muted,#667985)}
+.assignment-classroom-select,.assignment-create-card label,.assignment-submission-list label{display:grid;gap:7px;font-weight:600;font-size:.9rem}
+.assignment-classroom-select{max-width:520px;margin-bottom:18px}
+.assignment-center input,.assignment-center textarea,.assignment-center select{width:100%;min-width:0;padding:11px 12px;border:1px solid var(--border-color,#dbe4e8);border-radius:10px;background:var(--surface,#fff);color:inherit;font:inherit}
+.assignment-layout{display:grid;grid-template-columns:minmax(260px,.85fr) minmax(300px,1.15fr);gap:18px}
+.assignment-create-card,.assignment-list-card,.assignment-submissions{padding:20px;border:1px solid var(--border-color,#e2e9ec);border-radius:16px;background:var(--surface-soft,#f8fafb)}
+.assignment-create-card h3,.assignment-list-card h3{display:flex;align-items:center;gap:8px;margin:0 0 16px;font-size:1.05rem}
+.assignment-create-card form,.assignment-submission-list form{display:grid;gap:13px}
+.assignment-context{display:flex;align-items:center;gap:7px;margin:0;color:var(--text-muted,#647783);font-size:.85rem}
+.assignment-list-card h3 span,.assignment-submissions-heading>span{margin-left:auto;padding:4px 9px;border-radius:999px;background:var(--surface,#fff);font-size:.8rem}
+.assignment-list{display:grid;gap:10px}
+.assignment-list article{padding:12px;border:1px solid var(--border-color,#e0e8eb);border-radius:12px;background:var(--surface,#fff)}
+.assignment-list article.selected{border-color:var(--accent,#16a085)}
+.assignment-item-main{display:grid;gap:5px;width:100%;padding:0;border:0;background:none;color:inherit;text-align:left;cursor:pointer}
+.assignment-item-main span,.assignment-submission-list small{color:var(--text-muted,#6c7d86);font-size:.82rem}
+.assignment-item-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:11px}
+.assignment-item-actions button{padding:7px 11px;font-size:.83rem}
+.assignment-submissions{margin-top:18px}
+.assignment-submissions-heading h3{margin:5px 0 0}
+.assignment-submission-list{display:grid;gap:12px}
+.assignment-submission-list article{display:grid;grid-template-columns:minmax(0,1fr) minmax(190px,.55fr);gap:20px;padding:16px;border:1px solid var(--border-color,#e0e8eb);border-radius:12px;background:var(--surface,#fff)}
+.assignment-submission-list article>div{min-width:0}
+.assignment-submission-list small{display:block;margin:5px 0 10px}
+.assignment-submission-list pre{max-height:220px;overflow:auto;padding:12px;border-radius:9px;background:var(--surface-soft,#f5f7f8);white-space:pre-wrap;overflow-wrap:anywhere;font-size:.82rem}
+.assignment-grade-result{display:flex;align-items:center;gap:7px;color:var(--accent,#16856f);font-weight:650}
+.assignment-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;min-height:150px;padding:24px;color:var(--text-muted,#657783);text-align:center}
+.assignment-empty strong{color:var(--text-primary,#243746)}
+.assignment-empty.compact{min-height:80px;padding:12px}
+.assignment-message{margin:12px 0;padding:11px 14px;border-radius:10px;font-size:.9rem}
+.assignment-message.error{background:#fff0ee;color:#9c352b}
+.assignment-message.success{background:#eaf8f2;color:#176b50}
+.assignment-spin{animation:assignment-spin 1s linear infinite}
+@keyframes assignment-spin{to{transform:rotate(360deg)}}
+@media(max-width:760px){.assignment-center{padding:17px}.assignment-layout,.assignment-submission-list article{grid-template-columns:1fr}.assignment-center-heading{align-items:flex-start;flex-direction:column}.assignment-submission-list article{gap:12px}}
