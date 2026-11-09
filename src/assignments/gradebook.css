@@ -5,7 +5,7 @@
 .gradebook-actions{display:flex;flex-wrap:wrap;gap:8px}
 .gradebook-room{display:grid;gap:7px;max-width:540px;margin:20px 0;font-weight:650;font-size:.9rem}
 .teacher-gradebook select{padding:10px 12px;border:1px solid var(--border-color,#dbe4e8);border-radius:10px;background:var(--surface,#fff);color:inherit;font:inherit}
-.gradebook-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:18px 0}
+.gradebook-metrics{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:18px 0}
 .gradebook-metrics article{display:grid;gap:6px;padding:15px;border:1px solid var(--border-color,#e2e9ec);border-radius:13px;background:var(--surface-soft,#f8fafb)}
 .gradebook-metrics span{color:var(--text-muted,#657783);font-size:.82rem}
 .gradebook-metrics strong{font-size:1.45rem;font-variant-numeric:tabular-nums}
