@@ -4,6 +4,7 @@
 - Vista por aula de las matrículas, tareas, entregas y notas.
 - Promedio individual calculado únicamente con entregas calificadas.
 - Promedio global de las calificaciones registradas en el aula.
+- Conteo separado de entregas por calificar y tareas publicadas aún sin entregar.
 - Indicadores de estudiantes, tareas, entregas calificadas y pendientes.
 - Filtros para todos los estudiantes, con tareas pendientes o con calificaciones.
 - Exportación CSV compatible con hojas de cálculo e impresión.
