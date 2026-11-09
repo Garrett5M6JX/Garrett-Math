@@ -3,6 +3,7 @@
 ## Incluye
 - Incorporación a un aula mediante código con RPC de base de datos.
 - Consulta de aulas a las que el estudiante ya pertenece.
+- El panel docente muestra el código que debe compartir con su grupo.
 - Lista de tareas publicadas, con instrucciones y fecha límite.
 - Envío de una respuesta JSON mediante la RPC protegida de V39.
 - Consulta de entregas propias, calificaciones y retroalimentación docente.
