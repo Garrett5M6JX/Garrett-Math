@@ -7,15 +7,16 @@ import { catalog, clone } from './fixtures'
 test('el catálogo incluido es válido (referencias, ejercicios, pistas, textos alternativos)', () => {
   assert.deepEqual(validateCatalog(rawCatalog), [])
 })
-test('el mapa curricular contempla las cuatro etapas y conserva contenido real en las dos iniciales', () => {
+test('el mapa curricular cubre cuatro etapas y Secundaria ya tiene una ruta inicial real', () => {
   assert.deepEqual(catalog.stages.map((s) => s.id), ['preescolar', 'primaria', 'secundaria', 'universidad'])
   assert.equal(catalog.gradesByStage.get('secundaria')?.length, 5)
   assert.equal(catalog.gradesByStage.get('universidad')?.length, 5)
-  assert.equal(catalog.stages.find((s) => s.id === 'secundaria')?.status, 'planned')
+  assert.equal(catalog.stages.find((s) => s.id === 'secundaria')?.status, 'available')
   assert.equal(catalog.stages.find((s) => s.id === 'universidad')?.status, 'planned')
   assert.equal(catalog.gradesByStage.get('preescolar')?.length, 3)
   assert.equal(catalog.gradesByStage.get('primaria')?.length, 6)
-  assert.ok(catalog.lessons.length >= 40, `lecciones: ${catalog.lessons.length}`)
+  assert.ok(catalog.lessons.length >= 45, `lecciones: ${catalog.lessons.length}`)
+  assert.ok(catalog.topics.filter((t) => t.id.startsWith('sec-')).length >= 20)
   for (const grade of catalog.grades) {
     const count = [...(catalog.unitsByGrade.get(grade.id) ?? [])].flatMap((u) => catalog.topicsByUnit.get(u.id) ?? []).flatMap((t) => catalog.lessonsByTopic.get(t.id) ?? []).length
     const stage = catalog.stageById.get(grade.stageId)
@@ -23,7 +24,8 @@ test('el mapa curricular contempla las cuatro etapas y conserva contenido real e
       assert.equal(count, 0, `el grado planificado ${grade.id} no debe aparentar contenido publicado`)
       continue
     }
-    assert.ok(count >= 3, `el grado ${grade.id} tiene solo ${count} lecciones`)
+    const minimum = grade.stageId === 'secundaria' ? 1 : 3
+    assert.ok(count >= minimum, `el grado ${grade.id} tiene solo ${count} lecciones`)
   }
 })
 test('todo el contenido está marcado como borrador (ninguna revisión docente declarada)', () => {
