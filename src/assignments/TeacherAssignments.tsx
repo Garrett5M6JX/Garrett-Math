@@ -7,7 +7,7 @@ import {
 import { BookOpenCheck, CalendarClock, CheckCircle2, ClipboardList, LoaderCircle, Plus, RefreshCw, Users } from 'lucide-react'
 import './assignments.css'
 
-type Classroom = { id: string; name: string; stage: string; education_year: string }
+type Classroom = { id: string; name: string; stage: string; education_year: string; join_code: string }
 
 export default function TeacherAssignments() {
   const [classrooms, setClassrooms] = useState<Classroom[]>([])
@@ -32,7 +32,7 @@ export default function TeacherAssignments() {
     if (authError || !user) { setError('Inicia sesión con tu cuenta docente.'); setLoading(false); return }
     if (user.app_metadata?.assigned_role !== 'teacher') { setError('Esta cuenta no tiene el rol docente autorizado.'); setLoading(false); return }
     const { data, error: classroomError } = await supabase.from('gm_classrooms')
-      .select('id,name,stage,education_year').eq('teacher_id', user.id).order('created_at', { ascending: false })
+      .select('id,name,stage,education_year,join_code').eq('teacher_id', user.id).order('created_at', { ascending: false })
     if (classroomError) { setError('No se pudieron cargar tus aulas. Comprueba las migraciones V23–V24 y V39. ' + classroomError.message); setLoading(false); return }
     const list = (data ?? []) as Classroom[]
     setClassrooms(list)
@@ -123,7 +123,7 @@ export default function TeacherAssignments() {
             <label>Título<input value={title} onChange={(e) => setTitle(e.target.value)} minLength={3} maxLength={140} required placeholder="Ej. Práctica de fracciones"/></label>
             <label>Instrucciones<textarea value={instructions} onChange={(e) => setInstructions(e.target.value)} maxLength={10000} rows={4} placeholder="Explica qué deben hacer los estudiantes…"/></label>
             <label>Fecha límite (opcional)<input type="datetime-local" value={dueAt} onChange={(e) => setDueAt(e.target.value)}/></label>
-            <p className="assignment-context"><BookOpenCheck size={15}/> {classrooms.find((c) => c.id === classroomId)?.stage} · {classrooms.find((c) => c.id === classroomId)?.education_year}</p>
+            <p className="assignment-context"><BookOpenCheck size={15}/> {classrooms.find((c) => c.id === classroomId)?.stage} · {classrooms.find((c) => c.id === classroomId)?.education_year}</p><p className="assignment-join-code"><Users size={15}/> Código para tus estudiantes: <strong>{classrooms.find((c) => c.id === classroomId)?.join_code}</strong></p>
             <button className="primary-button" type="submit" disabled={saving || !title.trim()}>{saving ? <LoaderCircle className="assignment-spin"/> : <Plus size={16}/>} Guardar borrador</button>
           </form>
         </div>

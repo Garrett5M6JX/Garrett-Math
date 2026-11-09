@@ -1,0 +1,34 @@
+.student-assignment-center{margin:24px 0;padding:25px;border:1px solid var(--border-color,rgba(30,55,70,.12));border-radius:22px;background:var(--surface,#fff);box-shadow:0 12px 34px rgba(22,48,60,.06)}
+.student-assignment-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px}
+.student-assignment-heading h2{display:flex;align-items:center;gap:10px;margin:7px 0;font-size:1.4rem}
+.student-assignment-heading p{margin:0;color:var(--text-muted,#667985)}
+.student-join-form{display:grid;gap:8px;margin:18px 0;padding:16px;border-radius:14px;background:var(--surface-soft,#f6f9f8)}
+.student-join-form>label,.student-room-select,.student-delivery-form label{display:grid;gap:7px;font-weight:650;font-size:.9rem}
+.student-join-form>div{display:flex;gap:9px}
+.student-assignment-center input,.student-assignment-center textarea,.student-assignment-center select{width:100%;min-width:0;padding:11px 12px;border:1px solid var(--border-color,#dbe4e8);border-radius:10px;background:var(--surface,#fff);color:inherit;font:inherit}
+.student-join-form input{max-width:330px;text-transform:uppercase;letter-spacing:.08em}
+.student-room-select{max-width:520px;margin:18px 0}
+.student-room-summary{display:flex;align-items:center;gap:12px;margin:16px 0;padding:14px 16px;border:1px solid var(--border-color,#e1e9eb);border-radius:13px}
+.student-room-summary>div{display:grid;gap:3px;flex:1}
+.student-room-summary>div span,.student-room-summary>span{color:var(--text-muted,#687985);font-size:.84rem}
+.student-assignment-list{display:grid;gap:13px}
+.student-assignment-card{padding:18px;border:1px solid var(--border-color,#e1e8eb);border-radius:15px;background:var(--surface-soft,#fbfcfc)}
+.student-assignment-card-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.student-assignment-card h3{margin:5px 0 8px;font-size:1.08rem}
+.student-status{padding:5px 10px;border-radius:999px;background:#edf2f4;color:#4d626d;font-size:.78rem;font-weight:700;white-space:nowrap}
+.student-status.graded{background:#e5f5ed;color:#176b50}.student-status.sent{background:#e8f2fb;color:#285b86}.student-status.closed{background:#f8eee8;color:#93502f}
+.student-assignment-instructions{white-space:pre-wrap;line-height:1.6}
+.student-assignment-deadline{display:flex;align-items:center;gap:7px;color:var(--text-muted,#687985);font-size:.84rem}
+.student-delivery-form{display:grid;gap:10px;margin-top:14px}
+.student-delivery-form textarea{resize:vertical}
+.student-delivery-form button{justify-self:start}
+.student-submission-feedback{display:flex;gap:10px;margin-top:14px;padding:13px;border-radius:11px;background:var(--surface,#fff);color:var(--accent,#16856f)}
+.student-submission-feedback p{margin:5px 0;color:var(--text-primary,#263c46)}
+.student-submission-feedback small{color:var(--text-muted,#6b7a83)}
+.student-assignment-message{margin:12px 0;padding:11px 14px;border-radius:10px;font-size:.9rem}
+.student-assignment-message.error{background:#fff0ee;color:#9c352b}.student-assignment-message.success{background:#eaf8f2;color:#176b50}
+.student-assignment-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;min-height:135px;padding:22px;color:var(--text-muted,#657783);text-align:center}
+.student-assignment-empty strong{color:var(--text-primary,#243746)}.student-assignment-empty.compact{min-height:90px}
+.student-assignment-spin{animation:student-assignment-spin 1s linear infinite}
+@keyframes student-assignment-spin{to{transform:rotate(360deg)}}
+@media(max-width:680px){.student-assignment-center{padding:17px}.student-assignment-heading{flex-direction:column}.student-join-form>div{flex-direction:column}.student-join-form input{max-width:none}.student-assignment-card-heading{flex-direction:column}.student-room-summary{align-items:flex-start;flex-wrap:wrap}}
