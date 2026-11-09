@@ -3,7 +3,7 @@ import type { Area, Grade, Stage, Unit } from '../../types.js'
 export const stages: Stage[] = [
   { id: 'preescolar', name: 'Preescolar', ageRange: '3–5 años', order: 1, description: 'Descubrir los números, las formas y los patrones jugando, observando y manipulando.' },
   { id: 'primaria', name: 'Primaria', ageRange: '6–11 años', order: 2, description: 'Construir una base sólida: números, operaciones, fracciones, geometría, medida y datos.', status: 'available' },
-  { id: 'secundaria', name: 'Secundaria', ageRange: '12–17 años', order: 3, description: 'Profundizar en álgebra, funciones, geometría, estadística y resolución de problemas.', status: 'planned' },
+  { id: 'secundaria', name: 'Secundaria', ageRange: '12–17 años', order: 3, description: 'Profundizar en álgebra, funciones, geometría, estadística y resolución de problemas.', status: 'available' },
   { id: 'universidad', name: 'Universidad', ageRange: 'Nivel superior', order: 4, description: 'Avanzar hacia el razonamiento formal, el cálculo, el álgebra lineal y sus aplicaciones.', status: 'planned' },
 ]
 
@@ -84,4 +84,25 @@ export const units: Unit[] = [
   u('pri-6', 'fracciones', 3, 'Fracciones avanzadas', 'Multiplicar fracciones.'),
   u('pri-6', 'datos', 4, 'Estadística y probabilidad', 'Media y azar.'),
   u('pri-6', 'patrones', 5, 'Proporcionalidad y álgebra inicial', 'Razones, tablas y expresiones.'),
+  // Secundaria: unidades iniciales por año. El catálogo crecerá sin marcar temas incompletos como lecciones publicadas.
+  u('sec-1', 'numeros', 1, 'Números racionales y reales', 'Operaciones, comparación y representación de números.'),
+  u('sec-1', 'operaciones', 2, 'Introducción al álgebra', 'Expresiones, propiedades y ecuaciones sencillas.'),
+  u('sec-1', 'geometria', 3, 'Geometría plana', 'Ángulos, polígonos, perímetros y áreas.'),
+  u('sec-1', 'datos', 4, 'Estadística descriptiva', 'Organización y lectura de datos.'),
+  u('sec-2', 'numeros', 1, 'Potencias y raíces', 'Propiedades de potencias y raíces cuadradas.'),
+  u('sec-2', 'operaciones', 2, 'Ecuaciones lineales', 'Ecuaciones de primer grado y problemas.'),
+  u('sec-2', 'patrones', 3, 'Proporcionalidad', 'Razones, proporciones y porcentajes.'),
+  u('sec-2', 'geometria', 4, 'Semejanza y Pitágoras', 'Escalas, semejanza y triángulos rectángulos.'),
+  u('sec-3', 'numeros', 1, 'Números reales', 'Intervalos, valor absoluto y notación científica.'),
+  u('sec-3', 'operaciones', 2, 'Polinomios y factorización', 'Operaciones con polinomios y productos notables.'),
+  u('sec-3', 'patrones', 3, 'Funciones y gráficas', 'Relaciones, dominio, rango y representación.'),
+  u('sec-3', 'datos', 4, 'Probabilidad', 'Experimentos aleatorios y probabilidad simple.'),
+  u('sec-4', 'operaciones', 1, 'Ecuaciones cuadráticas', 'Resolución por factorización y fórmula general.'),
+  u('sec-4', 'patrones', 2, 'Funciones cuadráticas', 'Parábolas, vértice y transformaciones.'),
+  u('sec-4', 'geometria', 3, 'Trigonometría', 'Razones trigonométricas en triángulos rectángulos.'),
+  u('sec-4', 'datos', 4, 'Estadística y dispersión', 'Medidas de tendencia central y dispersión.'),
+  u('sec-5', 'operaciones', 1, 'Expresiones racionales y radicales', 'Simplificación y operaciones algebraicas.'),
+  u('sec-5', 'patrones', 2, 'Funciones exponenciales y logarítmicas', 'Modelos de crecimiento y logaritmos.'),
+  u('sec-5', 'geometria', 3, 'Geometría analítica', 'Rectas, circunferencias y cónicas introductorias.'),
+  u('sec-5', 'datos', 4, 'Estadística inferencial inicial', 'Muestreo, variabilidad e interpretación.'),
 ]
