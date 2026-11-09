@@ -5,14 +5,14 @@
  * El contenido es dato puro: no contiene JSX ni estilos.
  */
 
-export type StageId = 'preescolar' | 'primaria'
+export type StageId = 'preescolar' | 'primaria' | 'secundaria' | 'universidad'
 export type Difficulty = 1 | 2 | 3
 /** Estado editorial del contenido. Nada del catálogo inicial está validado por docentes. */
 export type ReviewStatus = 'borrador' | 'revisado'
 export type ColorKey = 'rojo' | 'azul' | 'verde' | 'amarillo' | 'morado' | 'naranja'
 export type ShapeKey = 'circulo' | 'cuadrado' | 'triangulo' | 'estrella' | 'rombo'
 
-export type Stage = { id: StageId; name: string; ageRange: string; description: string; order: number }
+export type Stage = { id: StageId; name: string; ageRange: string; description: string; order: number; status?: 'available' | 'planned' }
 export type Grade = { id: string; stageId: StageId; name: string; order: number; ageLabel?: string }
 export type Area = { id: string; name: string; description: string; order: number; icon: AreaIcon }
 export type AreaIcon = 'numeros' | 'operaciones' | 'fracciones' | 'geometria' | 'medida' | 'datos' | 'patrones' | 'problemas'
