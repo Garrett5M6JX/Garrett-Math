@@ -16,11 +16,7 @@ create table if not exists public.gm_assignments (
  created_at timestamptz not null default now(),
  updated_at timestamptz not null default now(),
  constraint gm_assignments_lesson_ids_count check (cardinality(lesson_ids) <= 100),
- constraint gm_assignments_classroom_stage check (
-   exists (select 1 from public.gm_classrooms c where c.id=classroom_id and c.teacher_id=teacher_id
-     and c.stage=stage and c.education_year=education_year)
- )
-);
+ );
 create index if not exists gm_assignments_classroom_status_idx
  on public.gm_assignments(classroom_id,status,created_at desc);
 create index if not exists gm_assignments_teacher_idx
