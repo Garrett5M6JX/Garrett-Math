@@ -29,7 +29,8 @@ export async function listStudentClassrooms(): Promise<StudentClassroom[]> {
     .select('joined_at,gm_classrooms!inner(id,name,stage,education_year)')
     .eq('student_id', user.id).order('joined_at', { ascending: false })
   if (error) throw error
-  return (data ?? []).map((row: any) => ({
+  type MembershipRow = { joined_at: string; gm_classrooms: { id: string; name: string; stage: string; education_year: string } }
+  return ((data ?? []) as unknown as MembershipRow[]).map((row) => ({
     id: row.gm_classrooms.id, name: row.gm_classrooms.name,
     stage: row.gm_classrooms.stage, education_year: row.gm_classrooms.education_year,
     joined_at: row.joined_at,
