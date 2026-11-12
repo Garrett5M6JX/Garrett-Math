@@ -190,3 +190,75 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   .auth-card{backdrop-filter:blur(8px)}
 }
 @media(prefers-reduced-motion:reduce){.auth-shell::before,.auth-shell::after{transform:none}}
+
+
+/* V35 — Design tokens y estados de interacción compartidos.
+   Esta capa consolida reglas visuales sin alterar flujos, permisos ni persistencia. */
+:root{
+  --althea-radius-control:12px;
+  --althea-radius-card:18px;
+  --althea-radius-panel:24px;
+  --althea-shadow-card:0 8px 24px rgba(18,59,74,.055);
+  --althea-shadow-hover:0 14px 34px rgba(18,59,74,.10);
+  --althea-focus-ring:0 0 0 4px rgba(7,158,170,.18);
+  --althea-transition:background-color .18s ease,border-color .18s ease,color .18s ease,box-shadow .18s ease,transform .18s ease;
+  --althea-text-strong:#123b4a;
+  --althea-text-body:#294b50;
+  --althea-text-muted:#637d80;
+  --althea-surface-soft:#f1f8f4;
+}
+:where(a,button,input,select,textarea,[tabindex]):focus-visible{
+  outline:3px solid var(--althea-teal);
+  outline-offset:3px;
+}
+:where(input,select,textarea){
+  accent-color:var(--althea-forest);
+}
+:where(button,a,.subject-card,.stage-course-card,.stat-card,.admin-card){
+  transition:var(--althea-transition);
+}
+:where(.auth-card,.subject-card,.stage-course-card,.stat-card,.profile-editor,.admin-card,.stage-year-panel){
+  border-radius:var(--althea-radius-card);
+}
+:where(.subject-card,.stage-course-card,.stat-card,.profile-editor,.admin-card){
+  box-shadow:var(--althea-shadow-card);
+}
+:where(.subject-card,.stage-course-card,.admin-action-grid button):hover{
+  box-shadow:var(--althea-shadow-hover);
+}
+:where(.auth-form input,.auth-card select,.child-form input,.child-form select,.teacher-form-grid select){
+  border-radius:var(--althea-radius-control);
+  transition:var(--althea-transition);
+}
+:where(button,input,select,textarea):disabled{
+  cursor:not-allowed;
+  opacity:.62;
+}
+:where(.auth-card,.admin-shell,.gm-lib,.lib-public){
+  color:var(--althea-text-body);
+}
+.auth-brand .althea-brand-symbol{
+  width:60px;
+  height:60px;
+  object-fit:contain;
+  flex:0 0 60px;
+}
+.auth-brand strong,.brand strong,.welcome-row h1,.stage-heading-row h1{
+  color:var(--althea-text-strong);
+}
+@media(hover:hover){
+  .auth-primary:hover,.primary-button:hover{transform:translateY(-1px)}
+}
+@media(max-width:680px){
+  :root{--althea-radius-card:16px;--althea-radius-panel:20px}
+  .auth-shell{min-height:100svh}
+  .auth-card{width:min(100%,510px)}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    scroll-behavior:auto!important;
+    animation-duration:.01ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.01ms!important;
+  }
+}
